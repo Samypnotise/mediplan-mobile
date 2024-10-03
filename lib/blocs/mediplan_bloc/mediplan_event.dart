@@ -4,6 +4,8 @@ class MediplanInit extends MediplanEvent {}
 
 class MediplanLoading extends MediplanEvent {}
 
+class TriggerFetchUserData extends MediplanEvent {}
+
 class TriggerDeadlineUpdate extends MediplanEvent {}
 
 class TriggerSubjectUpdate extends MediplanEvent {}

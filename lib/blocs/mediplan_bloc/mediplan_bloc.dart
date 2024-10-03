@@ -10,10 +10,10 @@ class MediplanBloc extends Bloc<MediplanEvent, MediplanState> {
   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
 
   MediplanBloc({required this.mediplanRepository}) : super(MediplanState()) {
-    add(TriggerSettingsUpdate());
-
-    on<TriggerSettingsUpdate>(
-      (event, emit) async {},
+    on<TriggerFetchUserData>(
+      (event, emit) async {
+        print("fetching user data ...");
+      },
     );
   }
 }

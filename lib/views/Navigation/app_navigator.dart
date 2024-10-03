@@ -1,4 +1,5 @@
-import 'package:mediplan/blocs/mediplan_bloc/mediplan_cubit.dart';
+import 'package:mediplan/blocs/mediplan_bloc/mediplan_bloc.dart';
+import 'package:mediplan/blocs/mediplan_bloc/mediplan_event.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_state.dart';
 import 'package:mediplan/blocs/auth_bloc/auth_cubit.dart';
 import 'package:mediplan/repositories/mediplan_repository.dart';
@@ -33,19 +34,25 @@ class AppNavigator extends StatelessWidget {
             ),
           if (state is Authenticated)
             MaterialPage(
-                child: RepositoryProvider(
-              create: (context) => MediplanRepository(),
-              child: BlocProvider(
-                create: (context) => MediplanCubit(
-                  mediplanRepository: context.read<MediplanRepository>(),
-                ),
-                child: BlocBuilder<MediplanCubit, MediplanState>(
-                  builder: (context, state) {
-                    return const NavigationBarView();
+              child: RepositoryProvider(
+                create: (context) => MediplanRepository(),
+                child: BlocProvider<MediplanBloc>(
+                  create: (context) {
+                    final academyBloc = MediplanBloc(
+                        mediplanRepository: context.read<MediplanRepository>());
+
+                    academyBloc.add(TriggerFetchUserData());
+
+                    return academyBloc;
                   },
+                  child: BlocBuilder<MediplanBloc, MediplanState>(
+                    builder: (context, state) {
+                      return const NavigationBarView();
+                    },
+                  ),
                 ),
               ),
-            )),
+            ),
         ],
         onPopPage: (route, result) => route.didPop(result),
       );
