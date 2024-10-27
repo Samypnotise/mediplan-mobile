@@ -43,40 +43,31 @@ class _LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Connexion',
-          style: TextStyle(
-            fontFamily: GoogleFonts.oleoScript().fontFamily,
-            fontSize: 50,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Text(
+            'Connexion',
+            style: TextStyle(
+              fontFamily: GoogleFonts.oleoScript().fontFamily,
+              fontSize: 50,
+            ),
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
+            child: Center(
               child: Column(
                 children: [
+                  const Spacer(),
                   //! Login image
                   SvgPicture.asset(
                     'lib/images/Tablet-login-amico.svg',
                     width: 250,
                   ),
-                  //! Google login button
-                  const Padding(
-                    padding: EdgeInsets.only(top: 20),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 60,
-                      child: GoogleLoginButton(),
-                    ),
-                  ),
-                  //! OR separator
-                  const Padding(
-                    padding: EdgeInsets.only(top: 20),
-                    child: OrSeparator(),
-                  ),
+                  const Spacer(),
                   //! Login form
                   LoginForm(formKey: _formKey),
                 ],
@@ -121,44 +112,6 @@ class OrSeparator extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class GoogleLoginButton extends StatelessWidget {
-  const GoogleLoginButton({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: MediplanColors.quaternary,
-        elevation: 5,
-        shadowColor: MediplanColors.quaternary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          SvgPicture.asset(
-            'lib/images/google-logo.svg',
-            width: 32,
-          ),
-          Text(
-            "Se connecter avec Google",
-            style: GoogleFonts.sourceSansPro(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -220,46 +173,49 @@ class LoginForm extends StatelessWidget {
                             strokeWidth: 6,
                           ),
                         )
-                      : SizedBox(
-                          width: double.infinity,
-                          height: 60,
-                          child: ElevatedButton(
-                            onPressed: () => {
-                              if (state.isValidEmail && state.isValidPassword)
-                                {
-                                  context
-                                      .read<LoginBloc>()
-                                      .add(LoginSubmitted())
-                                }
-                              else
-                                {
-                                  showCustomFlushbar(
-                                    context,
-                                    'Ouuups ...',
-                                    'Vous devez fournir votre email et votre mot de passe.',
-                                    const FaIcon(
-                                      FontAwesomeIcons.solidFaceFrownOpen,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                    FlushbarType.warning,
-                                  )
-                                }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: MediplanColors.primary,
-                              elevation: 5,
-                              shadowColor: MediplanColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                      : Padding(
+                          padding: const EdgeInsets.only(bottom: 15),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: () => {
+                                if (state.isValidEmail && state.isValidPassword)
+                                  {
+                                    context
+                                        .read<LoginBloc>()
+                                        .add(LoginSubmitted())
+                                  }
+                                else
+                                  {
+                                    showCustomFlushbar(
+                                      context,
+                                      'Ouuups ...',
+                                      'Vous devez fournir votre email et votre mot de passe.',
+                                      const FaIcon(
+                                        FontAwesomeIcons.solidFaceFrownOpen,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      FlushbarType.warning,
+                                    )
+                                  }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: MediplanColors.primary,
+                                elevation: 5,
+                                shadowColor: MediplanColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              "Se connecter !",
-                              style: GoogleFonts.sourceSansPro(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: MediplanColors.background,
+                              child: Text(
+                                "Se connecter !",
+                                style: GoogleFonts.sourceSansPro(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: MediplanColors.background,
+                                ),
                               ),
                             ),
                           ),
