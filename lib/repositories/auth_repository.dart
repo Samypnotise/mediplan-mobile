@@ -44,7 +44,7 @@ class AuthRepository {
   //! Get the user
   Future<http.Response> getUser({required String token}) async {
     final response = await http.get(
-      Uri.parse("${BasicRoutes.get("profiles")}/me"),
+      Uri.parse("${BasicRoutes.get("users")}/me"),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
