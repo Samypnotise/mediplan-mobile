@@ -64,8 +64,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           );
         }
 
-        emit(state.copyWith(formStatus: const InitialFormStatus()));
-
         emit(state.copyWith(formStatus: SubmissionSuccess()));
         // Resetting to avoid flushbars when changing email/password values
         emit(state.copyWith(formStatus: const InitialFormStatus()));
