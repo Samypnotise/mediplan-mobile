@@ -1,6 +1,7 @@
 import 'package:mediplan/blocs/navigation_bloc/navigation_cubit.dart';
 import 'package:mediplan/blocs/navigation_bloc/navigation_state.dart';
 import 'package:mediplan/blocs/session_bloc/session_cubit.dart';
+import 'package:mediplan/components/confirmation_modal.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/views/current_mission_view.dart';
 import 'package:mediplan/views/home_view.dart';
@@ -48,7 +49,43 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                 IconButton(
                   highlightColor: MediplanColors.quaternary,
                   onPressed: () {
-                    context.read<SessionCubit>().signOut();
+                    showConfirmationModal(
+                      context,
+                      heightMultiplicator: 0.27,
+                      Row(
+                        children: [
+                          const FaIcon(
+                            FontAwesomeIcons.triangleExclamation,
+                            size: 30,
+                            color: MediplanColors.danger,
+                          ),
+                          // Spacer to push the text to the center
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                "Déconnexion en cours",
+                                style: GoogleFonts.sourceSansPro(
+                                  fontWeight: FontWeight.w900,
+                                  color: MediplanColors.danger,
+                                  fontSize: 24,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const FaIcon(
+                            FontAwesomeIcons.triangleExclamation,
+                            size: 30,
+                            color: MediplanColors.danger,
+                          ),
+                        ],
+                      ),
+                      "Voulez-vous vraiment vous déconnecter ?",
+                      () {
+                        Navigator.pop(context);
+                        context.read<SessionCubit>().signOut();
+                      },
+                    );
                   },
                   icon: const Padding(
                     padding: EdgeInsets.only(right: 20),
