@@ -5,6 +5,7 @@ class MediplanColors {
   static const secondary = Color.fromRGBO(0, 140, 190, 1); // Aqua blue
   static const tertiary = Color.fromRGBO(72, 191, 227, 1); // Soft sky blue
   static const quaternary = Color.fromRGBO(204, 236, 242, 1);
+  static const blur = Color.fromRGBO(72, 191, 227, 0.5);
 
   static const background = Color.fromRGBO(248, 247, 255, 1);
 
