@@ -11,7 +11,7 @@ class NavigationCubit extends Cubit<NavigationState> {
 
   //? Available in sidebar
   void showProfileView() => emit(Profile());
-  void showMissionSwap() => emit(MissionSwap());
-  void showSettings() => emit(Settings());
-  void showHelp() => emit(Help());
+  void showMissionSwapView() => emit(MissionSwap());
+  void showSettingsView() => emit(Settings());
+  void showHelpView() => emit(Help());
 }
