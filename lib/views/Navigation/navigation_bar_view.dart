@@ -5,6 +5,7 @@ import 'package:mediplan/components/confirmation_modal.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/views/current_mission_view.dart';
 import 'package:mediplan/views/home_view.dart';
+import 'package:mediplan/views/mission_swap_view.dart';
 import 'package:mediplan/views/planning_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -100,6 +101,7 @@ class _NavigationBarViewState extends State<NavigationBarView> {
             ),
             bottomNavigationBar: const BottomNavigationBar(),
             drawer: const SidebarDrawer(),
+            //! Managing the different views
             body: BlocBuilder<NavigationCubit, NavigationState>(
               builder: (context, state) {
                 if (state is Home) {
@@ -108,6 +110,8 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                   return const PlanningView();
                 } else if (state is CurrentMission) {
                   return const CurrentMissionView();
+                } else if (state is MissionSwap) {
+                  return const MissionSwapView();
                 } else {
                   return const Center(
                     child: CircularProgressIndicator(
@@ -255,7 +259,8 @@ class SidebarDrawer extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                // TODO : Navigation to subscription page
+                Navigator.pop(context); //? Closes the drawer
+                context.read<NavigationCubit>().showMissionSwapView();
               },
             ),
           ),
