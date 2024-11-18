@@ -115,7 +115,6 @@ class _PlanningViewState extends State<PlanningView> {
                   height: 60,
                   child: ElevatedButton(
                     onPressed: () {
-                      // TODO : Display the bottom sheet to show the google map
                       showGoogleMapModal(context);
                     },
                     style: ElevatedButton.styleFrom(
