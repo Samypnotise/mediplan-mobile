@@ -9,8 +9,8 @@ class MediplanRepository {
     required String token,
   }) async {
     final response = await http.get(
-      // TODO : add the filter to only fetch caregivers
-      Uri.parse(BasicRoutes.get("users")),
+      // TODO : Idée d'amélioration : mettre le type de user dans des constantes
+      Uri.parse("${BasicRoutes.get("users")}/?type=CAREGIVER"),
       headers: {
         "Content-Type": 'application/json',
         "Authorization": 'Bearer $token'
