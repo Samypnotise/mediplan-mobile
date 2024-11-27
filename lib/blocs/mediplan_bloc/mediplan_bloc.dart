@@ -36,10 +36,9 @@ class MediplanBloc extends Bloc<MediplanEvent, MediplanState> {
       final token = await secureStorage.read(key: 'jwt');
 
       final response = await mediplanRepository.getCaregivers(token: token!);
-      print(response.statusCode);
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(response.body)["data"];
 
         if (data.length != 0) {
           for (var i = 0; i < data.length; i++) {
@@ -53,7 +52,6 @@ class MediplanBloc extends Bloc<MediplanEvent, MediplanState> {
             mediplanStatus: MediplanSuccessStatus(),
           ),
         );
-        print("C'est good les gars");
       } else {
         emit(
           state.copyWith(
