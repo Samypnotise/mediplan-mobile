@@ -351,7 +351,7 @@ class BottomNavigationBar extends StatelessWidget {
                   icon: FaIcon(
                     FontAwesomeIcons.solidHospital,
                     color: state is Home
-                        ? MediplanColors.primary
+                        ? MediplanColors.background
                         : MediplanColors.black,
                     size: 30,
                   ),
@@ -368,7 +368,7 @@ class BottomNavigationBar extends StatelessWidget {
                   icon: FaIcon(
                     FontAwesomeIcons.solidCalendarDays,
                     color: state is Planning
-                        ? MediplanColors.primary
+                        ? MediplanColors.background
                         : MediplanColors.black,
                     size: 30,
                   ),
@@ -385,7 +385,7 @@ class BottomNavigationBar extends StatelessWidget {
                   icon: FaIcon(
                     FontAwesomeIcons.heartPulse,
                     color: state is CurrentMission
-                        ? MediplanColors.primary
+                        ? MediplanColors.background
                         : MediplanColors.black,
                     size: 30,
                   ),
