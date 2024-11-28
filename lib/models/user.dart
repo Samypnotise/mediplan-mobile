@@ -25,6 +25,7 @@ class User with CustomDropdownListFilter {
   //? Allows this object to be searchable in a dropdown
   @override
   bool filter(String query) {
-    return lastName.toLowerCase().contains(query.toLowerCase());
+    return lastName.toLowerCase().contains(query.toLowerCase()) ||
+        firstName.toLowerCase().contains(query.toLowerCase());
   }
 }
