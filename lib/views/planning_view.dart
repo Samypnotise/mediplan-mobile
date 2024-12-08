@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:mediplan/components/google_map_modal.dart';
+import 'package:mediplan/blocs/mediplan_bloc/mediplan_bloc.dart';
+import 'package:mediplan/blocs/mediplan_bloc/mediplan_state.dart';
+import 'package:mediplan/components/mission_tile.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
+import 'package:mediplan/models/mission.dart';
 
 class PlanningView extends StatefulWidget {
   const PlanningView({super.key});
@@ -107,47 +111,40 @@ class _PlanningViewState extends State<PlanningView> {
                   ],
                 ),
               ),
-              const Spacer(),
 
-              //! Bouton permettant de montrer l'itinéraire sur la carte, dans une BottomSheet
-              if (_currentDate.day == DateTime.now().day)
-                SizedBox(
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      showGoogleMapModal(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: MediplanColors.secondary,
-                      elevation: 5,
-                      shadowColor: MediplanColors.quaternary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+              //! Liste des missions
+              BlocBuilder<MediplanBloc, MediplanState>(
+                builder: (context, mediplanState) {
+                  List<Mission>? missions = mediplanState.missions
+                      ?.where(
+                        (Mission mission) =>
+                            mission.start.day == _currentDate.day,
+                      )
+                      .toList();
+
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        itemCount: missions!.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom: index == missions.length - 1 ? 10 : 0,
+                            ),
+                            child: MissionTile(mission: missions[index]),
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return const SizedBox(height: 15);
+                        },
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const FaIcon(
-                          FontAwesomeIcons.locationDot,
-                          color: Colors.white,
-                          size: 25,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text(
-                            "Afficher l'itinéraire",
-                            style: GoogleFonts.sourceSansPro(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                  );
+                },
+              ),
             ],
           ),
         ),
