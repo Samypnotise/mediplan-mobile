@@ -1,5 +1,6 @@
 import 'package:mediplan/blocs/navigation_bloc/navigation_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mediplan/models/mission.dart';
 
 class NavigationCubit extends Cubit<NavigationState> {
   NavigationCubit() : super(Home());
@@ -7,7 +8,8 @@ class NavigationCubit extends Cubit<NavigationState> {
   //? Available in bottom navigation bar
   void showHomeView() => emit(Home());
   void showPlanningView() => emit(Planning());
-  void showCurrentMissionView() => emit(CurrentMission());
+  void showCurrentMissionView(Mission currentMission) =>
+      emit(CurrentMission(currentMission: currentMission));
 
   //? Available in sidebar
   void showProfileView() => emit(Profile());
