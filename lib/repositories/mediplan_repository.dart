@@ -2,7 +2,21 @@ import 'package:http/http.dart' as http;
 import 'package:mediplan/routes/basic_routes.dart';
 
 class MediplanRepository {
-  // TODO : Method to return user's missions
+  Future<http.Response> getUserMissions({
+    required String userId,
+    required String token,
+  }) async {
+    final response = await http.get(
+      // TODO : À voir pour refactor cette partie et gérer la pagination
+      Uri.parse("${BasicRoutes.get("users")}/$userId/missions?limit=100"),
+      headers: {
+        "Content-Type": 'application/json',
+        "Authorization": 'Bearer $token'
+      },
+    );
+
+    return response;
+  }
 
   //! Method to get other users
   Future<http.Response> getCaregivers({
