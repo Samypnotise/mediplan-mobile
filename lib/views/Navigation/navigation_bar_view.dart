@@ -27,6 +27,8 @@ class _NavigationBarViewState extends State<NavigationBarView> {
       create: (context) => NavigationCubit(),
       child: BlocBuilder<NavigationCubit, NavigationState>(
         builder: (context, state) {
+          final navigationCubit = context.read<NavigationCubit>();
+
           return Scaffold(
             appBar: AppBar(
               //? Builder is necessary to access the Scaffol.of(context) to display drawer
@@ -34,15 +36,19 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                 builder: (context) {
                   return IconButton(
                     highlightColor: MediplanColors.quaternary,
-                    icon: const Padding(
-                      padding: EdgeInsets.only(left: 20),
+                    icon: Padding(
+                      padding: const EdgeInsets.only(left: 20),
                       child: FaIcon(
-                        FontAwesomeIcons.barsStaggered,
+                        state is CurrentMission
+                            ? FontAwesomeIcons.chevronLeft
+                            : FontAwesomeIcons.barsStaggered,
                         color: MediplanColors.primary,
                         size: 30,
                       ),
                     ),
-                    onPressed: () => Scaffold.of(context).openDrawer(),
+                    onPressed: () => state is CurrentMission
+                        ? navigationCubit.showPlanningView()
+                        : Scaffold.of(context).openDrawer(),
                   );
                 },
               ),
