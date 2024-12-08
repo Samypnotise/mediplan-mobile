@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'package:intl/intl.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/models/directions.dart';
+import 'package:mediplan/models/mission.dart';
 import 'package:mediplan/repositories/directions_repository.dart';
 
 Future<dynamic> showGoogleMapModal(
   BuildContext context,
+  Mission mission,
 ) {
   return showModalBottomSheet(
     isScrollControlled: true, // To adjust size
@@ -18,7 +20,7 @@ Future<dynamic> showGoogleMapModal(
     barrierColor: MediplanColors.blur,
     context: context,
     builder: (context) {
-      return const MissionRecapView();
+      return MissionRecapView(mission: mission);
     },
   );
 }
@@ -26,21 +28,26 @@ Future<dynamic> showGoogleMapModal(
 class MissionRecapView extends StatefulWidget {
   const MissionRecapView({
     super.key,
+    required this.mission,
   });
+
+  final Mission mission;
 
   @override
   State<MissionRecapView> createState() => _MissionRecapViewState();
 }
 
 class _MissionRecapViewState extends State<MissionRecapView> {
-  int _missionNumber = 0;
-
   @override
   Widget build(BuildContext context) {
+    final mission = widget.mission;
+
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    bool isMissionAvailable = mission.start.isBefore(DateTime.now());
 
     return SizedBox(
-      height: height * 0.9,
+      height: height * (isMissionAvailable ? 0.95 : 0.85),
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.all(25),
@@ -70,6 +77,7 @@ class _MissionRecapViewState extends State<MissionRecapView> {
                 const SizedBox(width: 10),
               ],
             ),
+
             //! Nom du patient
             Padding(
               padding: const EdgeInsets.only(top: 30),
@@ -83,7 +91,7 @@ class _MissionRecapViewState extends State<MissionRecapView> {
                   Padding(
                     padding: const EdgeInsets.only(left: 15),
                     child: Text(
-                      "M. Dupond", // TODO : Change with dynamic data when database done
+                      mission.patient,
                       style: GoogleFonts.sourceSansPro(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -108,11 +116,41 @@ class _MissionRecapViewState extends State<MissionRecapView> {
                   Padding(
                     padding: const EdgeInsets.only(left: 13),
                     child: Text(
-                      "15h30 - 16h00", // TODO : Change with dynamic data when database done
+                      "${DateFormat("HH:mm").format(mission.start)} - ${DateFormat("HH:mm").format(mission.end)}",
                       style: GoogleFonts.sourceSansPro(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                         fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            //! Titre de la mission
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Row(
+                children: [
+                  const FaIcon(
+                    FontAwesomeIcons.syringe,
+                    color: Colors.black,
+                    size: 25,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 13),
+                    child: SizedBox(
+                      width: width * 0.75,
+                      child: Text(
+                        mission.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.sourceSansPro(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -141,88 +179,51 @@ class _MissionRecapViewState extends State<MissionRecapView> {
               ),
             ),
 
-            //! Mission suivante/précédente
-            Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: Container(
-                height: 60,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: MediplanColors.secondary,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: MediplanColors.quaternary,
-                      spreadRadius: 1,
-                      blurRadius: 4,
-                      offset: Offset(0, 4),
+            const Spacer(),
+
+            //! Accéder au compte rendu de la mission
+            if (isMissionAvailable)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 5,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 15,
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    //! Mission précédente
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: SizedBox(
-                        width: 30,
-                        child: _missionNumber > 0
-                            ? IconButton(
-                                onPressed: _missionNumber > 0
-                                    ? () {
-                                        // TODO : Set boundaries according to the number of missions
-                                        setState(() {
-                                          _missionNumber -= 1;
-                                        });
-                                      }
-                                    : null,
-                                icon: const FaIcon(
-                                  FontAwesomeIcons.chevronLeft,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                              )
-                            : null,
-                      ),
+                    backgroundColor: MediplanColors.secondary,
+                    shadowColor: MediplanColors.quaternary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Text(
-                      "Mission ${_missionNumber + 1}/7",
-                      style: GoogleFonts.sourceSansPro(
-                        fontWeight: FontWeight.bold,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const FaIcon(
+                        FontAwesomeIcons.fileMedical,
                         color: Colors.white,
-                        fontSize: 25,
                       ),
-                    ),
-                    //! Mission suivante
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: SizedBox(
-                        width: 30,
-                        child: _missionNumber <
-                                6 // TODO : Change the boundary with daily mission length
-                            ? IconButton(
-                                onPressed: () {
-                                  // TODO : Set boundaries according to the number of missions
-                                  setState(() {
-                                    _missionNumber += 1;
-                                  });
-                                },
-                                icon: const FaIcon(
-                                  FontAwesomeIcons.chevronRight,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
-                              )
-                            : null,
-                      ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          "Compte rendu",
+                          style: GoogleFonts.sourceSansPro(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            const Spacer(),
             //! Bouton retour
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
