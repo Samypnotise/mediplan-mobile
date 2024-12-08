@@ -109,7 +109,9 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                 } else if (state is Planning) {
                   return const PlanningView();
                 } else if (state is CurrentMission) {
-                  return const CurrentMissionView();
+                  return CurrentMissionView(
+                    currentMission: state.currentMission,
+                  );
                 } else if (state is MissionSwap) {
                   return const MissionSwapView();
                 } else {
@@ -245,7 +247,7 @@ class SidebarDrawer extends StatelessWidget {
             child: ListTile(
               splashColor: MediplanColors.secondary,
               leading: const FaIcon(
-                FontAwesomeIcons.handHoldingMedical,
+                FontAwesomeIcons.arrowRightArrowLeft,
                 color: MediplanColors.background,
                 size: 30,
               ),
@@ -380,11 +382,11 @@ class BottomNavigationBar extends StatelessWidget {
                 return IconButton(
                   enableFeedback: false,
                   onPressed: () {
-                    context.read<NavigationCubit>().showCurrentMissionView();
+                    context.read<NavigationCubit>().showMissionSwapView();
                   },
                   icon: FaIcon(
-                    FontAwesomeIcons.heartPulse,
-                    color: state is CurrentMission
+                    FontAwesomeIcons.arrowRightArrowLeft,
+                    color: state is MissionSwap
                         ? MediplanColors.background
                         : MediplanColors.black,
                     size: 30,
