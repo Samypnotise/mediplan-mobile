@@ -8,7 +8,7 @@ class MediplanRepository {
   }) async {
     final response = await http.get(
       // TODO : À voir pour refactor cette partie et gérer la pagination
-      Uri.parse("${BasicRoutes.get("users")}/$userId/missions?limit=100"),
+      Uri.parse("${BasicRoutes.get("missions")}?limit=100"),
       headers: {
         "Content-Type": 'application/json',
         "Authorization": 'Bearer $token'
