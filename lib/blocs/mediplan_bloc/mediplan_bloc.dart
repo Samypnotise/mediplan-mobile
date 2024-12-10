@@ -20,10 +20,12 @@ class MediplanBloc extends Bloc<MediplanEvent, MediplanState> {
 
   Future<void> _onFetchUserData(
       TriggerFetchUserData event, Emitter<MediplanState> emit) async {
-    print("fetching user data ... TODO HERE");
+    print("Fetching user data...");
 
     await attemptFetchingCaregivers(emit);
     await attemptFetchingUserMissions(emit);
+
+    print("User data fetched !");
   }
 
   //! Méthode permettant de récupérer les missions de l'utilisateur
@@ -51,6 +53,7 @@ class MediplanBloc extends Bloc<MediplanEvent, MediplanState> {
             missions.add(Mission.fromJson(data[i]));
           }
         }
+
         if (data.length > 1) {
           missions.sort((a, b) {
             // Compare by last time studied
@@ -105,6 +108,24 @@ class MediplanBloc extends Bloc<MediplanEvent, MediplanState> {
           for (var i = 0; i < data.length; i++) {
             caregivers.add(User.fromJson(data[i]));
           }
+        }
+
+        if (data.length > 1) {
+          caregivers.sort((a, b) {
+            // Compare by last name first
+            int lastNameComparison =
+                a.lastName.toLowerCase().compareTo(b.lastName.toLowerCase());
+
+            // If last names are equal, compare by first name
+            if (lastNameComparison == 0) {
+              return a.firstName
+                  .toLowerCase()
+                  .compareTo(b.lastName.toLowerCase());
+            }
+
+            // Otherwise, return the result of last name comparison
+            return lastNameComparison;
+          });
         }
 
         emit(
