@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mediplan/blocs/navigation_bloc/navigation_cubit.dart';
 import 'package:mediplan/blocs/navigation_bloc/navigation_state.dart';
 import 'package:mediplan/blocs/session_bloc/session_cubit.dart';
@@ -7,10 +11,6 @@ import 'package:mediplan/views/current_mission_view.dart';
 import 'package:mediplan/views/home_view.dart';
 import 'package:mediplan/views/mission_swap_view.dart';
 import 'package:mediplan/views/planning_view.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class NavigationBarView extends StatefulWidget {
   const NavigationBarView({super.key});
@@ -40,10 +40,10 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                       padding: const EdgeInsets.only(left: 20),
                       child: FaIcon(
                         state is CurrentMission
-                            ? FontAwesomeIcons.chevronLeft
+                            ? FontAwesomeIcons.circleChevronLeft
                             : FontAwesomeIcons.barsStaggered,
                         color: MediplanColors.primary,
-                        size: 30,
+                        size: 35,
                       ),
                     ),
                     onPressed: () => state is CurrentMission
@@ -99,7 +99,7 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                     child: FaIcon(
                       FontAwesomeIcons.powerOff,
                       color: MediplanColors.danger,
-                      size: 30,
+                      size: 35,
                     ),
                   ),
                 ),
