@@ -64,6 +64,16 @@ class HomeView extends StatelessWidget {
                 ],
               ),
 
+              const Spacer(),
+
+              //! Prochaine missions dans : (nombre d'heures et minutes)
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: NextMissionTile(phoneWidth: phoneWidth),
+              ),
+
+              const Spacer(),
+
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Row(
@@ -78,11 +88,7 @@ class HomeView extends StatelessWidget {
                 ),
               ),
 
-              //! Prochaine missions dans : (nombre d'heures et minutes)
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: NextMissionTile(phoneWidth: phoneWidth),
-              ),
+              const Spacer(),
             ],
           ),
         ),
@@ -102,7 +108,7 @@ class MissionsToday extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 110,
+      height: 150,
       width: phoneWidth * 0.40,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -119,8 +125,8 @@ class MissionsToday extends StatelessWidget {
       child: Stack(
         children: [
           const Positioned(
-            top: 5,
-            right: 5,
+            top: 10,
+            right: 10,
             child: FaIcon(
               FontAwesomeIcons.staffSnake,
               color: MediplanColors.secondary,
@@ -150,7 +156,7 @@ class MissionsToday extends StatelessWidget {
                         .toList();
 
                     return Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         //! Nombre de missions
                         Row(
@@ -213,7 +219,7 @@ class MissionSwapTiles extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 110,
+      height: 150,
       width: phoneWidth * 0.40,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -230,8 +236,8 @@ class MissionSwapTiles extends StatelessWidget {
       child: Stack(
         children: [
           const Positioned(
-            top: 5,
-            right: 5,
+            top: 10,
+            right: 10,
             child: FaIcon(
               FontAwesomeIcons.handHoldingMedical,
               color: MediplanColors.secondary,
@@ -252,7 +258,7 @@ class MissionSwapTiles extends StatelessWidget {
                   bottom: 10,
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     //! Nombre d'échanges
                     Row(
@@ -330,22 +336,26 @@ class NextMissionTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          splashColor: MediplanColors.quaternary,
-          onTap: () {
-            // context.read<NavigationCubit>().showCurrentMissionView();
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: BlocBuilder<MediplanBloc, MediplanState>(
-              builder: (context, mediplanState) {
-                List<Mission>? missions = mediplanState.missions
-                    ?.where((Mission mission) =>
-                        mission.start.isAfter(DateTime.now()))
-                    .toList();
+        child: BlocBuilder<MediplanBloc, MediplanState>(
+          builder: (context, mediplanState) {
+            List<Mission>? missions = mediplanState.missions
+                ?.where(
+                    (Mission mission) => mission.start.isAfter(DateTime.now()))
+                .toList();
 
-                return missions!.isNotEmpty
+            return InkWell(
+              borderRadius: BorderRadius.circular(20),
+              splashColor: MediplanColors.quaternary,
+              onTap: missions!.isNotEmpty
+                  ? () {
+                      context
+                          .read<NavigationCubit>()
+                          .showCurrentMissionView(missions[0]);
+                    }
+                  : null,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: missions.isNotEmpty
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -406,7 +416,7 @@ class NextMissionTile extends StatelessWidget {
                                     style: GoogleFonts.sourceSansPro(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
-                                      fontSize: 15,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -433,7 +443,7 @@ class NextMissionTile extends StatelessWidget {
                                     style: GoogleFonts.sourceSansPro(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
-                                      fontSize: 15,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -460,7 +470,7 @@ class NextMissionTile extends StatelessWidget {
                                     style: GoogleFonts.sourceSansPro(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
-                                      fontSize: 15,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
@@ -492,10 +502,10 @@ class NextMissionTile extends StatelessWidget {
                             ),
                           ),
                         ],
-                      );
-              },
-            ),
-          ),
+                      ),
+              ),
+            );
+          },
         ),
       ),
     );
