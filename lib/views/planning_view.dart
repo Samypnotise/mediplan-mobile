@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -21,6 +22,8 @@ class _PlanningViewState extends State<PlanningView> {
 
   @override
   Widget build(BuildContext context) {
+    double phoneWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -66,51 +69,6 @@ class _PlanningViewState extends State<PlanningView> {
                   ),
                 ],
               ),
-              //! Sélecteur de date
-              Padding(
-                padding: const EdgeInsets.only(top: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _currentDate =
-                              _currentDate.subtract(const Duration(days: 1));
-                        });
-                      },
-                      icon: const FaIcon(
-                        FontAwesomeIcons.solidHandPointLeft,
-                        color: MediplanColors.primary,
-                        size: 35,
-                      ),
-                    ),
-                    Text(
-                      _currentDate.day == DateTime.now().day
-                          ? "Aujourd'hui"
-                          : DateFormat("dd/MM/yyyy").format(_currentDate),
-                      style: GoogleFonts.sourceSansPro(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 30,
-                        color: Colors.black,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          _currentDate =
-                              _currentDate.add(const Duration(days: 1));
-                        });
-                      },
-                      icon: const FaIcon(
-                        FontAwesomeIcons.solidHandPointRight,
-                        color: MediplanColors.primary,
-                        size: 35,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
 
               //! Liste des missions
               BlocBuilder<MediplanBloc, MediplanState>(
@@ -125,25 +83,107 @@ class _PlanningViewState extends State<PlanningView> {
                   return Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(top: 20),
-                      child: ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        itemCount: missions!.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom: index == missions.length - 1 ? 10 : 0,
+                      child: missions!.isEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    'lib/images/Researching-amico.svg',
+                                    width: phoneWidth * 0.8,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 30),
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      "Vous n'avez pas de mission pour la date sélectionnée.",
+                                      style: GoogleFonts.sourceSansPro(
+                                        fontWeight: FontWeight.bold,
+                                        fontStyle: FontStyle.italic,
+                                        color: MediplanColors.placeholder,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.separated(
+                              physics: const BouncingScrollPhysics(),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5),
+                              itemCount: missions.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom:
+                                        index == missions.length - 1 ? 10 : 0,
+                                  ),
+                                  child: MissionTile(mission: missions[index]),
+                                );
+                              },
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(height: 15);
+                              },
                             ),
-                            child: MissionTile(mission: missions[index]),
-                          );
-                        },
-                        separatorBuilder: (context, index) {
-                          return const SizedBox(height: 15);
-                        },
-                      ),
                     ),
                   );
                 },
+              ),
+
+              const Padding(
+                padding: EdgeInsets.only(top: 15),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Divider(
+                    thickness: 4,
+                    color: MediplanColors.quaternary,
+                  ),
+                ),
+              ),
+
+              //! Sélecteur de date
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _currentDate =
+                            _currentDate.subtract(const Duration(days: 1));
+                      });
+                    },
+                    icon: const FaIcon(
+                      FontAwesomeIcons.circleChevronLeft,
+                      color: MediplanColors.secondary,
+                      size: 40,
+                    ),
+                  ),
+                  Text(
+                    _currentDate.day == DateTime.now().day
+                        ? "Aujourd'hui"
+                        : DateFormat("dd/MM/yyyy").format(_currentDate),
+                    style: GoogleFonts.sourceSansPro(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30,
+                      color: MediplanColors.secondary,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _currentDate =
+                            _currentDate.add(const Duration(days: 1));
+                      });
+                    },
+                    icon: const FaIcon(
+                      FontAwesomeIcons.circleChevronRight,
+                      color: MediplanColors.secondary,
+                      size: 42,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
