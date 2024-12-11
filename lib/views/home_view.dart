@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -151,7 +152,7 @@ class MissionsToday extends StatelessWidget {
                     List<Mission>? todayMissions = mediplanState.missions
                         ?.where(
                           (Mission mission) =>
-                              mission.start.isAfter(DateTime.now()),
+                              mission.start.day == DateTime.now().day,
                         )
                         .toList();
 
@@ -490,16 +491,25 @@ class NextMissionTile extends StatelessWidget {
                           ),
                         ],
                       )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Vous n'avez pas de mission aujourd'hui.",
-                            style: GoogleFonts.sourceSansPro(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
+                          SvgPicture.asset(
+                            'lib/images/Person with medical mask-amico.svg',
+                            width: phoneWidth * 0.4,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Vous n'avez plus de mission aujourd'hui.",
+                                style: GoogleFonts.sourceSansPro(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
