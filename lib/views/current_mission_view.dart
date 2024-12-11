@@ -160,7 +160,7 @@ class _MissionRecapViewState extends State<MissionRecapView> {
                 ],
               ),
               height: 375,
-              child: const MissionMap(),
+              child: MissionMap(mission: mission),
             ),
           ),
 
@@ -213,7 +213,9 @@ class _MissionRecapViewState extends State<MissionRecapView> {
 }
 
 class MissionMap extends StatefulWidget {
-  const MissionMap({super.key});
+  final Mission mission;
+
+  const MissionMap({super.key, required this.mission});
 
   @override
   State<MissionMap> createState() => _MissionMapState();
@@ -221,7 +223,7 @@ class MissionMap extends StatefulWidget {
 
 class _MissionMapState extends State<MissionMap> {
   static const LatLng sourceLocation = LatLng(47.640520, 6.853650);
-  static const LatLng destinationLocation = LatLng(47.638770, 6.862100);
+  late LatLng destinationLocation;
 
   late GoogleMapController _googleMapController;
   Directions? _directions;
@@ -252,6 +254,9 @@ class _MissionMapState extends State<MissionMap> {
   @override
   void initState() {
     // getCurrentLocation();
+    destinationLocation =
+        LatLng(widget.mission.longitude, widget.mission.latitude);
+
     getItinerary();
     super.initState();
   }
@@ -454,7 +459,7 @@ class _MissionMapState extends State<MissionMap> {
                       onPressed: () {
                         _googleMapController.animateCamera(
                           CameraUpdate.newCameraPosition(
-                            const CameraPosition(
+                            CameraPosition(
                               target: destinationLocation,
                               zoom: 16.5,
                             ),

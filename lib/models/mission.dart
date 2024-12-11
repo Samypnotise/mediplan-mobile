@@ -4,6 +4,8 @@ class Mission {
   final String patient;
   final DateTime start;
   final DateTime end;
+  final double latitude;
+  final double longitude;
 
   Mission({
     required this.id,
@@ -11,6 +13,8 @@ class Mission {
     required this.patient,
     required this.start,
     required this.end,
+    required this.latitude,
+    required this.longitude,
   });
 
   factory Mission.fromJson(Map<String, dynamic> json) {
@@ -20,6 +24,8 @@ class Mission {
       patient: json['patient'],
       start: DateTime.parse(json['start']),
       end: DateTime.parse(json['end']),
+      latitude: double.parse(json['latitude']),
+      longitude: double.parse(json['longitude']),
     );
   }
 }
