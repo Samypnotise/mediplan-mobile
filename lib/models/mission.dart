@@ -1,4 +1,6 @@
-class Mission {
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
+
+class Mission with CustomDropdownListFilter {
   final String id;
   final String title;
   final String patient;
@@ -27,5 +29,12 @@ class Mission {
       latitude: double.parse(json['latitude']),
       longitude: double.parse(json['longitude']),
     );
+  }
+
+  //? Allows this object to be searchable in a dropdown
+  @override
+  bool filter(String query) {
+    return patient.toLowerCase().contains(query.toLowerCase()) ||
+        title.toLowerCase().contains(query.toLowerCase());
   }
 }
