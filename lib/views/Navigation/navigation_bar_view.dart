@@ -41,6 +41,7 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                       child: FaIcon(
                         state is CurrentMission
                             ? FontAwesomeIcons.circleChevronLeft
+                            // TODO : Remplacer la barre de menu par une icone d'actualisation
                             : FontAwesomeIcons.barsStaggered,
                         color: MediplanColors.primary,
                         size: 35,
