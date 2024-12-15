@@ -50,6 +50,7 @@ dependencies:
   google_maps_flutter: ^2.10.0
   location: ^7.0.1
   flutter_dotenv: ^5.2.1
+  add_2_calendar: ^3.0.1
 
 dev_dependencies:
   flutter_test:
