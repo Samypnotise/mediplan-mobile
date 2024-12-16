@@ -3,11 +3,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:mediplan/components/report_modal.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/models/directions.dart';
 import 'package:mediplan/models/mission.dart';
 import 'package:mediplan/repositories/directions_repository.dart';
+import 'package:mediplan/services/location_service.dart';
 
 class CurrentMissionView extends StatelessWidget {
   const CurrentMissionView({
@@ -76,7 +78,7 @@ class _MissionRecapViewState extends State<MissionRecapView> {
                 Padding(
                   padding: const EdgeInsets.only(left: 13),
                   child: Text(
-                    "${DateFormat("HH:mm").format(mission.start)} - ${DateFormat("HH:mm").format(mission.end)}",
+                    "${DateFormat("dd/MM").format(mission.start)} • ${DateFormat("HH:mm").format(mission.start)} - ${DateFormat("HH:mm").format(mission.end)}",
                     style: GoogleFonts.sourceSansPro(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -172,7 +174,7 @@ class _MissionRecapViewState extends State<MissionRecapView> {
               height: 60,
               child: ElevatedButton(
                 onPressed: () {
-                  showReportModal(context);
+                  showReportModal(context, mission);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: MediplanColors.primary,
@@ -185,20 +187,20 @@ class _MissionRecapViewState extends State<MissionRecapView> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Compte rendu",
-                      style: GoogleFonts.sourceSansPro(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: MediplanColors.background,
-                      ),
+                    const FaIcon(
+                      FontAwesomeIcons.fileMedical,
+                      size: 25,
+                      color: Colors.white,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 10),
-                      child: FaIcon(
-                        FontAwesomeIcons.fileMedical,
-                        size: 25,
-                        color: Colors.white,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Text(
+                        "Compte rendu",
+                        style: GoogleFonts.sourceSansPro(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: MediplanColors.background,
+                        ),
                       ),
                     ),
                   ],
@@ -227,7 +229,9 @@ class _MissionMapState extends State<MissionMap> {
 
   late GoogleMapController _googleMapController;
   Directions? _directions;
-// LocationData? _currentLocation;
+  LocationData? _currentLocation;
+
+  LocationService locationService = LocationService();
 
   void getItinerary() async {
     final directions = await DirectionsRepository().getDirections(
@@ -240,22 +244,32 @@ class _MissionMapState extends State<MissionMap> {
     });
   }
 
-  // void getCurrentLocation() {
-  //   Location location = Location();
-  //
-  //   location.getLocation().then((LocationData location) {
-  //     print(location?.longitude);
-  //     // setState(() {
-  //     //   _currentLocation = location;
-  //     // });
-  //   });
-  // }
+  void getCurrentLocation() {
+    locationService.getCurrentLocation().then((LocationData location) {
+      print(location?.longitude);
+      setState(() {
+        _currentLocation = location;
+      });
+    });
+
+    // Location location = Location();
+
+    // location.getLocation().then((LocationData location) {
+    // print(location?.longitude);
+    // setState(() {
+    //   _currentLocation = location;
+    // });
+    // });
+  }
 
   @override
   void initState() {
-    // getCurrentLocation();
-    destinationLocation =
-        LatLng(widget.mission.longitude, widget.mission.latitude);
+    getCurrentLocation();
+
+    destinationLocation = LatLng(
+      widget.mission.latitude,
+      widget.mission.longitude,
+    );
 
     getItinerary();
     super.initState();
