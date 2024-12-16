@@ -11,6 +11,8 @@ class Input extends StatelessWidget {
   final Widget? suffixIcon;
   final void Function(String)? onChanged;
   final bool? isError;
+  final bool? multiline;
+  final double? heightMultiplicator;
 
   const Input({
     super.key,
@@ -22,6 +24,8 @@ class Input extends StatelessWidget {
     this.isPassword = false,
     this.onChanged,
     this.isError,
+    this.multiline = false,
+    this.heightMultiplicator = 0.065,
   });
 
   @override
@@ -47,6 +51,14 @@ class Input extends StatelessWidget {
         keyboardType: textInputType,
         obscureText: isPassword!,
         obscuringCharacter: passwordCharacter!,
+        maxLines: multiline! ? null : 1,
+        expands: multiline!,
+        onTapOutside: (event) {
+          FocusScope.of(context).unfocus();
+        },
+        onFieldSubmitted: (value) {
+          FocusScope.of(context).unfocus();
+        },
         style: GoogleFonts.sourceSansPro(
           fontWeight: FontWeight.bold,
           color: Colors.black,
@@ -54,7 +66,7 @@ class Input extends StatelessWidget {
         ),
         decoration: InputDecoration(
           constraints: BoxConstraints(
-            maxHeight: height * 0.065,
+            maxHeight: height * heightMultiplicator!,
             maxWidth: width,
           ),
           filled: true,
