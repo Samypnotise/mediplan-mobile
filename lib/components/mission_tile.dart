@@ -123,7 +123,7 @@ class MissionTile extends StatelessWidget {
               width: 80,
               height: 40,
               decoration: const BoxDecoration(
-                color: MediplanColors.secondary,
+                color: MediplanColors.primary,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(30),
                   topRight: Radius.circular(20),

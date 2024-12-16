@@ -156,7 +156,7 @@ class _PlanningViewState extends State<PlanningView> {
                     },
                     icon: const FaIcon(
                       FontAwesomeIcons.circleChevronLeft,
-                      color: MediplanColors.secondary,
+                      color: MediplanColors.primary,
                       size: 40,
                     ),
                   ),
@@ -167,7 +167,7 @@ class _PlanningViewState extends State<PlanningView> {
                     style: GoogleFonts.sourceSansPro(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
-                      color: MediplanColors.secondary,
+                      color: MediplanColors.primary,
                     ),
                   ),
                   IconButton(
@@ -179,7 +179,7 @@ class _PlanningViewState extends State<PlanningView> {
                     },
                     icon: const FaIcon(
                       FontAwesomeIcons.circleChevronRight,
-                      color: MediplanColors.secondary,
+                      color: MediplanColors.primary,
                       size: 42,
                     ),
                   ),
