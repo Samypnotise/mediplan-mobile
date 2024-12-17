@@ -51,6 +51,7 @@ dependencies:
   location: ^7.0.1
   flutter_dotenv: ^5.2.1
   add_2_calendar: ^3.0.1
+  map_launcher: ^3.5.0
 
 dev_dependencies:
   flutter_test:
