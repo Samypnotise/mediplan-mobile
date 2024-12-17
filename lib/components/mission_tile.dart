@@ -185,6 +185,7 @@ class MissionTile extends StatelessWidget {
                       () {
                         final Event event = Event(
                           title: mission.patient,
+                          location: mission.address,
                           startDate: mission.start,
                           endDate: mission.end,
                           description: mission.title,

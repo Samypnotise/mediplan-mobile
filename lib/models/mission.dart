@@ -8,6 +8,7 @@ class Mission with CustomDropdownListFilter {
   final DateTime end;
   final double latitude;
   final double longitude;
+  final String address;
 
   Mission({
     required this.id,
@@ -17,6 +18,7 @@ class Mission with CustomDropdownListFilter {
     required this.end,
     required this.latitude,
     required this.longitude,
+    required this.address,
   });
 
   factory Mission.fromJson(Map<String, dynamic> json) {
@@ -28,6 +30,7 @@ class Mission with CustomDropdownListFilter {
       end: DateTime.parse(json['end']),
       latitude: double.parse(json['latitude']),
       longitude: double.parse(json['longitude']),
+      address: json['address'],
     );
   }
 
