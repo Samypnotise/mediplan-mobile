@@ -264,11 +264,15 @@ class _ReportViewState extends State<ReportView> {
                               });
                             },
                             child: Center(
-                              child: FaIcon(
-                                _isPlaying
-                                    ? FontAwesomeIcons.pause
-                                    : FontAwesomeIcons.play,
-                                color: Colors.white,
+                              child: Padding(
+                                padding:
+                                    EdgeInsets.only(left: _isPlaying ? 0 : 3),
+                                child: FaIcon(
+                                  _isPlaying
+                                      ? FontAwesomeIcons.pause
+                                      : FontAwesomeIcons.play,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
