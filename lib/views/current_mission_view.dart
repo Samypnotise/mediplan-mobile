@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:mediplan/components/report_modal.dart';
@@ -65,54 +66,113 @@ class _MissionRecapViewState extends State<MissionRecapView> {
       width: double.infinity,
       child: Column(
         children: [
-          //! Horaires de la mission
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Row(
-              children: [
-                const FaIcon(
-                  FontAwesomeIcons.solidClock,
-                  color: MediplanColors.secondary,
-                  size: 25,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 13),
-                  child: Text(
-                    "${DateFormat("dd/MM").format(mission.start)} • ${DateFormat("HH:mm").format(mission.start)} - ${DateFormat("HH:mm").format(mission.end)}",
-                    style: GoogleFonts.sourceSansPro(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 20,
+          Stack(
+            children: [
+              Column(
+                children: [
+                  //! Horaires de la mission
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Row(
+                      children: [
+                        const FaIcon(
+                          FontAwesomeIcons.solidClock,
+                          color: MediplanColors.secondary,
+                          size: 25,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 13),
+                          child: Text(
+                            "${DateFormat("dd/MM").format(mission.start)} • ${DateFormat("HH:mm").format(mission.start)} - ${DateFormat("HH:mm").format(mission.end)}",
+                            style: GoogleFonts.sourceSansPro(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
 
-          //! Nom du patient
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Row(
-              children: [
-                const FaIcon(
-                  FontAwesomeIcons.solidUser,
-                  color: MediplanColors.secondary,
-                  size: 25,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Text(
-                    mission.patient,
-                    style: GoogleFonts.sourceSansPro(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 20,
+                  //! Nom du patient
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Row(
+                      children: [
+                        const FaIcon(
+                          FontAwesomeIcons.solidUser,
+                          color: MediplanColors.secondary,
+                          size: 25,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15),
+                          child: Text(
+                            mission.patient,
+                            style: GoogleFonts.sourceSansPro(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              //! Bouton pour lancer une application MAPS
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    color: MediplanColors.primary,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5), // Shadow color
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: const Offset(0, 3), // Shadow position
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(50),
+                    child: InkWell(
+                      splashColor: MediplanColors.quaternary,
+                      borderRadius: BorderRadius.circular(50),
+                      onTap: () async {
+                        // TODO : Faire la gestion de GoogleMaps pour android
+                        bool? isMapAvailable =
+                            await map_launcher.MapLauncher.isMapAvailable(
+                                map_launcher.MapType.apple);
+
+                        if (isMapAvailable!) {
+                          await map_launcher.MapLauncher.showMarker(
+                            mapType: map_launcher.MapType.apple,
+                            coords: map_launcher.Coords(
+                                mission.latitude, mission.longitude),
+                            title: mission.title,
+                          );
+                        }
+                      },
+                      child: const Center(
+                        child: FaIcon(
+                          FontAwesomeIcons.locationDot,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
 
           //! Titre de la mission
@@ -246,7 +306,7 @@ class _MissionMapState extends State<MissionMap> {
 
   void getCurrentLocation() {
     locationService.getCurrentLocation().then((LocationData location) {
-      print(location?.longitude);
+      print(location.longitude);
       setState(() {
         _currentLocation = location;
       });
