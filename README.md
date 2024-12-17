@@ -4,8 +4,6 @@
 
 ### Soins à domicile
 
-Personnel qui effectue des tournées vers des patients en partant d’un centre de soin
-
 - [x] Un serveur qui envoie aux soignants des tournées à réaliser
 - [ ] Le soignant sur l’appli, peut visualiser sa tournée sur la carte / un planning (vue jour / semaine)
 - [x] Partie synchronisation avec l’agenda personnel
@@ -16,20 +14,19 @@ Personnel qui effectue des tournées vers des patients en partant d’un centre 
 
 ---
 
-# 🚀 Procédé d'Installation
+# 🚑 Mediplan • Procédé d'installation
 
 ---
 
 ## 🛠️ Prérequis
 
-Avant de commencer, assurez-vous d'avoir :
+• Avant de commencer, assurez-vous d'avoir :
 
 1. **Un système d'exploitation pris en charge** :
    - Windows, macOS, ou Linux
 2. **Un éditeur de code** (au choix) :
    - [Visual Studio Code](https://code.visualstudio.com/) (recommandé)
    - [Android Studio](https://developer.android.com/studio)
-   - IntelliJ IDEA
 3. **Git** :
    - Télécharger et installer [Git](https://git-scm.com/).
 
