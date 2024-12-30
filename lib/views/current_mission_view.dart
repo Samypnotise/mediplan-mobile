@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:mediplan/components/report_modal.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/models/directions.dart';
@@ -289,7 +289,7 @@ class _MissionMapState extends State<MissionMap> {
 
   late GoogleMapController _googleMapController;
   Directions? _directions;
-  LocationData? _currentLocation;
+  // LocationData? _currentLocation; // Sera utile pour la localisation en temps reel
 
   LocationService locationService = LocationService();
 
@@ -304,27 +304,28 @@ class _MissionMapState extends State<MissionMap> {
     });
   }
 
-  void getCurrentLocation() {
-    locationService.getCurrentLocation().then((LocationData location) {
-      print(location.longitude);
-      setState(() {
-        _currentLocation = location;
-      });
-    });
+  //? Utile pour la localisation en temps reel
+  // void getCurrentLocation() {
+  //   locationService.getCurrentLocation().then((LocationData location) {
+  //     print(location.longitude);
+  //     setState(() {
+  //       _currentLocation = location;
+  //     });
+  //   });
 
-    // Location location = Location();
+  // Location location = Location();
 
-    // location.getLocation().then((LocationData location) {
-    // print(location?.longitude);
-    // setState(() {
-    //   _currentLocation = location;
-    // });
-    // });
-  }
+  // location.getLocation().then((LocationData location) {
+  // print(location?.longitude);
+  // setState(() {
+  //   _currentLocation = location;
+  // });
+  // });
+  // }
 
   @override
   void initState() {
-    getCurrentLocation();
+    // getCurrentLocation();
 
     destinationLocation = LatLng(
       widget.mission.latitude,

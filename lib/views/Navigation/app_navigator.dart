@@ -1,16 +1,16 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mediplan/blocs/auth_bloc/auth_cubit.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_bloc.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_event.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_state.dart';
-import 'package:mediplan/blocs/auth_bloc/auth_cubit.dart';
-import 'package:mediplan/repositories/mediplan_repository.dart';
-import 'package:mediplan/views/Authentication/auth_navigator.dart';
-import 'package:mediplan/repositories/auth_repository.dart';
-import 'package:mediplan/views/loading_view.dart';
 import 'package:mediplan/blocs/session_bloc/session_cubit.dart';
 import 'package:mediplan/blocs/session_bloc/session_state.dart';
+import 'package:mediplan/repositories/auth_repository.dart';
+import 'package:mediplan/repositories/mediplan_repository.dart';
+import 'package:mediplan/views/Authentication/auth_navigator.dart';
 import 'package:mediplan/views/Navigation/navigation_bar_view.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mediplan/views/loading_view.dart';
 
 class AppNavigator extends StatelessWidget {
   const AppNavigator({super.key});
@@ -38,12 +38,12 @@ class AppNavigator extends StatelessWidget {
                 create: (context) => MediplanRepository(),
                 child: BlocProvider<MediplanBloc>(
                   create: (context) {
-                    final academyBloc = MediplanBloc(
+                    final mediplanBloc = MediplanBloc(
                         mediplanRepository: context.read<MediplanRepository>());
 
-                    academyBloc.add(TriggerFetchUserData());
+                    mediplanBloc.add(TriggerFetchUserData());
 
-                    return academyBloc;
+                    return mediplanBloc;
                   },
                   child: BlocBuilder<MediplanBloc, MediplanState>(
                     builder: (context, state) {
