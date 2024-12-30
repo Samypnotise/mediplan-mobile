@@ -7,10 +7,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_bloc.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_state.dart';
+import 'package:mediplan/blocs/mission_swap_bloc/mission_swap_bloc.dart';
+import 'package:mediplan/blocs/mission_swap_bloc/mission_swap_event.dart';
+import 'package:mediplan/blocs/mission_swap_bloc/mission_swap_state.dart';
+import 'package:mediplan/components/confirmation_modal.dart';
+import 'package:mediplan/components/custom_flushbar.dart';
 import 'package:mediplan/components/loader.dart';
+import 'package:mediplan/components/mission_swap_tile.dart';
+import 'package:mediplan/constants/flushbar_type.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/models/mission.dart';
+import 'package:mediplan/models/mission_swap.dart';
 import 'package:mediplan/models/user.dart';
+import 'package:mediplan/repositories/mission_swap_repository.dart';
+import 'package:mediplan/status/form_submission_status.dart';
 
 class MissionSwapView extends StatefulWidget {
   const MissionSwapView({super.key});
@@ -41,7 +51,7 @@ class _MissionSwapViewState extends State<MissionSwapView> {
               Row(
                 children: [
                   Text(
-                    "Échanges de missions",
+                    "Échange de missions",
                     style: GoogleFonts.sourceSansPro(
                       fontWeight: FontWeight.bold,
                       fontSize: 30,
@@ -149,34 +159,42 @@ class _MissionSwapViewState extends State<MissionSwapView> {
                       ),
                       child: Stack(
                         children: [
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Container(
-                              width: 30,
-                              height: 30,
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(15),
-                                  bottomLeft: Radius.circular(10),
-                                ),
-                                color: MediplanColors.danger,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(1),
-                                child: Center(
-                                  child: Text(
-                                    // TODO : Remplacer par le vrai nombre de demandes recues (depuis le state mediplan)
-                                    "5",
-                                    style: GoogleFonts.sourceSansPro(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                          BlocBuilder<MediplanBloc, MediplanState>(
+                            builder: (context, state) {
+                              return state
+                                      .receivedMissionSwapDemands!.isNotEmpty
+                                  ? Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(15),
+                                            bottomLeft: Radius.circular(10),
+                                          ),
+                                          color: MediplanColors.danger,
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(1),
+                                          child: Center(
+                                            child: Text(
+                                              state.receivedMissionSwapDemands!
+                                                  .length
+                                                  .toString(),
+                                              style: GoogleFonts.sourceSansPro(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox(width: 0);
+                            },
                           ),
                           Material(
                             color: Colors.transparent,
@@ -222,10 +240,10 @@ class _MissionSwapViewState extends State<MissionSwapView> {
               //! Affichage conditionnel en fonction de la vue sélectionnée
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 50),
+                  padding: const EdgeInsets.only(top: 40),
                   child: _isShowingReceivedMissions
                       ? SwapDemandsList(phoneWidth: phoneWidth)
-                      : const NewSwapDemand(),
+                      : NewSwapDemand(phoneWidth: phoneWidth),
                 ),
               ),
             ],
@@ -237,115 +255,251 @@ class _MissionSwapViewState extends State<MissionSwapView> {
 }
 
 class NewSwapDemand extends StatelessWidget {
-  const NewSwapDemand({super.key});
+  const NewSwapDemand({
+    super.key,
+    required this.phoneWidth,
+  });
+
+  final double phoneWidth;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Column(
-          children: [
-            //! Mission a echanger
-            Row(
-              children: [
-                const FaIcon(
-                  FontAwesomeIcons.bookMedical,
-                  color: Colors.black,
-                  size: 30,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Text(
-                    "Mission à échanger",
-                    style: GoogleFonts.sourceSansPro(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            //! Mission dropdown
-            const Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: MissionsDropdown(),
-            ),
+    return RepositoryProvider(
+      create: (context) => MissionSwapRepository(),
+      child: BlocProvider(
+        create: (context) {
+          final missionSwapBloc = MissionSwapBloc(
+            mediplanBloc: context.read<MediplanBloc>(),
+            missionSwapRepository: context.read<MissionSwapRepository>(),
+          );
 
-            //! Caregiver title
-            Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: Row(
-                children: [
-                  const FaIcon(
-                    FontAwesomeIcons.userNurse,
-                    color: Colors.black,
-                    size: 30,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Text(
-                      "Aide-soignant",
-                      style: GoogleFonts.sourceSansPro(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            //! Caregiver dropdown
-            const Padding(
-              padding: EdgeInsets.only(top: 10),
-              child: CaregiversDropdown(),
-            ),
-          ],
-        ),
-        const Spacer(),
+          missionSwapBloc.add(InitMissionSwapDemand());
 
-        //! Bouton de demande d'échange de mission
-        SizedBox(
-          height: 60,
-          child: ElevatedButton(
-            onPressed: () {
-              // TODO : Open a confirmation modal to send the mission swap request
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: MediplanColors.primary,
-              elevation: 5,
-              shadowColor: MediplanColors.quaternary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+          return missionSwapBloc;
+        },
+        child: BlocListener<MissionSwapBloc, MissionSwapState>(
+          listener: (context, state) {
+            final formStatus = state.formStatus;
+
+            if (formStatus is SubmissionFailed) {
+              showCustomFlushbar(
+                context,
+                'Demande non créée ...',
+                "Veuillez réessayer ultérieurement.",
                 const FaIcon(
                   FontAwesomeIcons.arrowRightArrowLeft,
                   color: Colors.white,
-                  size: 25,
+                  size: 30,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Text(
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    "Faire une demande d'échange",
-                    style: GoogleFonts.sourceSansPro(
-                      fontSize: 19,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                FlushbarType.danger,
+              );
+            }
+
+            if (formStatus is SubmissionSuccess) {
+              showCustomFlushbar(
+                context,
+                'Demande créée avec succès !',
+                "La demande d'échange a bien été envoyée.",
+                const FaIcon(
+                  FontAwesomeIcons.arrowRightArrowLeft,
+                  color: Colors.white,
+                  size: 30,
+                ),
+                FlushbarType.success,
+              );
+            }
+          },
+          child: Column(
+            children: [
+              Column(
+                children: [
+                  //! Mission a echanger
+                  Row(
+                    children: [
+                      const FaIcon(
+                        FontAwesomeIcons.bookMedical,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          "Mission à échanger",
+                          style: GoogleFonts.sourceSansPro(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  //! Mission dropdown
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: BlocBuilder<MissionSwapBloc, MissionSwapState>(
+                      builder: (context, state) {
+                        return state.formStatus is InitialFormStatus
+                            ? const MissionsDropdown()
+                            : const Loader();
+                      },
                     ),
                   ),
-                ),
-              ],
-            ),
+
+                  //! Caregiver title
+                  BlocBuilder<MissionSwapBloc, MissionSwapState>(
+                    builder: (context, state) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                            top: state.missionId.isEmpty ? 20 : 30),
+                        child: state.missionId.isNotEmpty
+                            ? Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      const FaIcon(
+                                        FontAwesomeIcons.userNurse,
+                                        color: Colors.black,
+                                        size: 30,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 10),
+                                        child: Text(
+                                          "Aide-soignant",
+                                          style: GoogleFonts.sourceSansPro(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  //! Caregiver dropdown
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 10),
+                                    child: CaregiversDropdown(),
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                spacing: 10,
+                                children: [
+                                  SvgPicture.asset(
+                                    'lib/images/Select-amico.svg',
+                                    width: phoneWidth * 0.43,
+                                  ),
+                                  Text(
+                                    "Commencez par sélectionner une mission.",
+                                    style: GoogleFonts.sourceSansPro(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: MediplanColors.placeholder,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const Spacer(),
+
+              //! Bouton de demande d'échange de mission
+              BlocBuilder<MissionSwapBloc, MissionSwapState>(
+                builder: (context, state) {
+                  final bool isButtonDisabled =
+                      state.missionId.isEmpty || state.receiverId.isEmpty;
+
+                  return SizedBox(
+                    height: 60,
+                    child: ElevatedButton(
+                      onPressed: isButtonDisabled
+                          ? null
+                          : () {
+                              // TODO : Open a confirmation modal to send the mission swap request
+                              showConfirmationModal(
+                                context,
+                                heightMultiplicator: 0.30,
+                                Row(
+                                  children: [
+                                    const FaIcon(
+                                      FontAwesomeIcons.triangleExclamation,
+                                      size: 30,
+                                      color: MediplanColors.danger,
+                                    ),
+                                    // Spacer to push the text to the center
+                                    Expanded(
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "Émission de la demande",
+                                          style: GoogleFonts.sourceSansPro(
+                                            fontWeight: FontWeight.w900,
+                                            color: MediplanColors.danger,
+                                            fontSize: 24,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const FaIcon(
+                                      FontAwesomeIcons.triangleExclamation,
+                                      color: MediplanColors.danger,
+                                      size: 30,
+                                    ),
+                                  ],
+                                ),
+                                "Voulez-vous vraiment créer cette demande d'échange ?",
+                                () {
+                                  context
+                                      .read<MissionSwapBloc>()
+                                      .add(MissionSwapDemandCreated());
+                                },
+                              );
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: MediplanColors.primary,
+                        elevation: 5,
+                        shadowColor: MediplanColors.quaternary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FaIcon(
+                            isButtonDisabled
+                                ? FontAwesomeIcons.lock
+                                : FontAwesomeIcons.arrowRightArrowLeft,
+                            color: Colors.white,
+                            size: 25,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15),
+                            child: Text(
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              "Faire une demande d'échange",
+                              style: GoogleFonts.sourceSansPro(
+                                fontSize: 19,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
@@ -357,31 +511,58 @@ class SwapDemandsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        SvgPicture.asset(
-          'lib/images/Programmer-amico.svg',
-          width: phoneWidth * 0.8,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Loader(),
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Text(
-                "En cours de realisation...",
-                style: GoogleFonts.sourceSansPro(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: MediplanColors.placeholder,
+    return //! Liste des missions
+        BlocBuilder<MediplanBloc, MediplanState>(
+      builder: (context, mediplanState) {
+        List<MissionSwap>? receivedMissionSwapDemands =
+            mediplanState.receivedMissionSwapDemands;
+
+        return Expanded(
+          child: receivedMissionSwapDemands!.isEmpty
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'lib/images/Health professional team-amico.svg',
+                      width: phoneWidth * 0.8,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30),
+                      child: Text(
+                        textAlign: TextAlign.center,
+                        "Aucune demande d'échange reçue.",
+                        style: GoogleFonts.sourceSansPro(
+                          fontWeight: FontWeight.bold,
+                          fontStyle: FontStyle.italic,
+                          color: MediplanColors.placeholder,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : ListView.separated(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  itemCount: receivedMissionSwapDemands.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: index == receivedMissionSwapDemands.length - 1
+                            ? 10
+                            : 0,
+                      ),
+                      child: MissionSwapTile(
+                        missionSwapDemand: receivedMissionSwapDemands[index],
+                      ),
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return const SizedBox(height: 25);
+                  },
                 ),
-              ),
-            ),
-          ],
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -507,7 +688,9 @@ class CaregiversDropdown extends StatelessWidget {
           noResultFoundText: "Aucun aide-soignant trouvé...",
           excludeSelected: false,
           onChanged: (caregiver) {
-            // TODO : onChanged function in the list
+            context
+                .read<MissionSwapBloc>()
+                .add(ReceiverIdChanged(receiverId: caregiver!.id));
           },
         );
       },
@@ -634,8 +817,10 @@ class MissionsDropdown extends StatelessWidget {
           },
           noResultFoundText: "Aucune mission trouvée ...",
           excludeSelected: false,
-          onChanged: (caregiver) {
-            // TODO : onChanged function in the list
+          onChanged: (mission) {
+            context
+                .read<MissionSwapBloc>()
+                .add(MissionIdChanged(missionId: mission!.id));
           },
         );
       },

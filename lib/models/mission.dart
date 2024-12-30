@@ -1,4 +1,5 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import 'package:mediplan/models/user.dart';
 
 class Mission with CustomDropdownListFilter {
   final String id;
@@ -9,6 +10,8 @@ class Mission with CustomDropdownListFilter {
   final double latitude;
   final double longitude;
   final String address;
+  //? Utile pour les demandes d'échange
+  final User? assignee;
 
   Mission({
     required this.id,
@@ -19,6 +22,7 @@ class Mission with CustomDropdownListFilter {
     required this.latitude,
     required this.longitude,
     required this.address,
+    this.assignee,
   });
 
   factory Mission.fromJson(Map<String, dynamic> json) {
@@ -31,6 +35,8 @@ class Mission with CustomDropdownListFilter {
       latitude: double.parse(json['latitude']),
       longitude: double.parse(json['longitude']),
       address: json['address'],
+      assignee:
+          json['assignee'] != null ? User.fromJson(json['assignee']) : null,
     );
   }
 
