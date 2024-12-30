@@ -9,6 +9,7 @@ import 'package:mediplan/blocs/mediplan_bloc/mediplan_state.dart';
 import 'package:mediplan/blocs/navigation_bloc/navigation_cubit.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/models/mission.dart';
+import 'package:mediplan/models/mission_swap.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -56,7 +57,6 @@ class HomeView extends StatelessWidget {
                       "Un récapitulatif rapide de vos missions.",
                       style: GoogleFonts.sourceSansPro(
                         fontWeight: FontWeight.bold,
-                        fontStyle: FontStyle.italic,
                         color: MediplanColors.placeholder,
                         fontSize: 15,
                       ),
@@ -262,32 +262,39 @@ class MissionSwapTiles extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     //! Nombre d'échanges
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          "5", // TODO : Inclure le nombre de missions à partir du state Mediplan
-                          style: GoogleFonts.sourceSansPro(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 40,
-                            color: MediplanColors.secondary,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Text(
-                            "échanges",
+                    BlocBuilder<MediplanBloc, MediplanState>(
+                        builder: (context, state) {
+                      List<MissionSwap>? receivedMissionSwapDemands =
+                          state.receivedMissionSwapDemands;
+
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            receivedMissionSwapDemands!.length.toString(),
                             style: GoogleFonts.sourceSansPro(
                               fontWeight: FontWeight.bold,
-                              fontSize: 22,
-                              color: Colors.black,
+                              fontSize: 40,
+                              color: MediplanColors.secondary,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: Text(
+                              "échange${receivedMissionSwapDemands.length > 1 ? "s" : ""}",
+                              style: GoogleFonts.sourceSansPro(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+
                     //! Hint
                     Text(
                       "Cliquez pour y accéder",
