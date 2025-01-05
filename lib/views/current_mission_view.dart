@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
-import 'package:map_launcher/map_launcher.dart' as map_launcher;
+import 'package:mediplan/components/maps_selection_modal.dart';
 import 'package:mediplan/components/report_modal.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/models/directions.dart';
@@ -147,20 +147,8 @@ class _MissionRecapViewState extends State<MissionRecapView> {
                     child: InkWell(
                       splashColor: MediplanColors.quaternary,
                       borderRadius: BorderRadius.circular(50),
-                      onTap: () async {
-                        // TODO : Faire la gestion de GoogleMaps pour android
-                        bool? isMapAvailable =
-                            await map_launcher.MapLauncher.isMapAvailable(
-                                map_launcher.MapType.apple);
-
-                        if (isMapAvailable!) {
-                          await map_launcher.MapLauncher.showMarker(
-                            mapType: map_launcher.MapType.apple,
-                            coords: map_launcher.Coords(
-                                mission.latitude, mission.longitude),
-                            title: mission.title,
-                          );
-                        }
+                      onTap: () {
+                        showMapsSelectionModal(context, mission);
                       },
                       child: const Center(
                         child: FaIcon(

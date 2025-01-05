@@ -9,7 +9,8 @@
 - [ ] Le soignant peut visualiser ses missions selon un planning en vue semaine
 - [x] Le soignant peut chosir de visualiser l'itinéraire de sa mission sur Mediplan ou sur une autre application (Google Maps, Waze, Apple Plan...)
 - [x] Partie synchronisation avec l’agenda personnel
-- [x] Geo guidage de visite en visite (google maps entre chaque visite)
+- [x] Géoguidage de visite en visite (google maps entre chaque visite)
+- [x] Possibilité pour l'aide-soignant de choisir une autre application de géoguidage
 - [ ] Saisir le rapport de fin de visite sous forme écrite ou enregistrement vocal et l’envoyer au serveur
 - [x] Échange de mission entre deux soignants
 
