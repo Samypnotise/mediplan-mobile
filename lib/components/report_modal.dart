@@ -199,6 +199,8 @@ class _ReportViewState extends State<ReportView> {
               ],
             ),
 
+            const Spacer(),
+
             //! Divider
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
@@ -207,6 +209,8 @@ class _ReportViewState extends State<ReportView> {
                 color: MediplanColors.quaternary,
               ),
             ),
+
+            const Spacer(),
 
             //! Comptes rendus ecrits et vocaux
             Row(
@@ -330,7 +334,10 @@ class _ReportViewState extends State<ReportView> {
 
             //! Bouton de sauvegarde du compte rendu
             Padding(
-              padding: const EdgeInsets.only(top: 30),
+              padding: const EdgeInsets.only(
+                top: 30,
+                bottom: 10,
+              ),
               child: SizedBox(
                 width: double.infinity,
                 height: 60,
