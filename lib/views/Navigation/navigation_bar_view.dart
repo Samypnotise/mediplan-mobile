@@ -10,6 +10,7 @@ import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/views/current_mission_view.dart';
 import 'package:mediplan/views/home_view.dart';
 import 'package:mediplan/views/mission_swap_view.dart';
+import 'package:mediplan/views/mission_list_view.dart';
 import 'package:mediplan/views/planning_view.dart';
 
 class NavigationBarView extends StatefulWidget {
@@ -115,6 +116,8 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                   return const HomeView();
                 } else if (state is Planning) {
                   return const PlanningView();
+                } else if (state is MissionList) {
+                  return const MissionListView();
                 } else if (state is CurrentMission) {
                   return CurrentMissionView(
                     currentMission: state.currentMission,
@@ -377,6 +380,23 @@ class BottomNavigationBar extends StatelessWidget {
                   icon: FaIcon(
                     FontAwesomeIcons.solidCalendarDays,
                     color: state is Planning
+                        ? MediplanColors.background
+                        : MediplanColors.black,
+                    size: 30,
+                  ),
+                );
+              },
+            ),
+            BlocBuilder<NavigationCubit, NavigationState>(
+              builder: (context, state) {
+                return IconButton(
+                  enableFeedback: false,
+                  onPressed: () {
+                    context.read<NavigationCubit>().showMissionListView();
+                  },
+                  icon: FaIcon(
+                    FontAwesomeIcons.list,
+                    color: state is MissionList
                         ? MediplanColors.background
                         : MediplanColors.black,
                     size: 30,

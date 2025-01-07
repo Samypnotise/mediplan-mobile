@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_bloc.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_state.dart';
-import 'package:mediplan/components/mission_tile.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/models/mission.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
+
+class DataSource extends CalendarDataSource {
+  DataSource(List<Appointment> source) {
+    appointments = source;
+  }
+}
 
 class PlanningView extends StatefulWidget {
   const PlanningView({super.key});
@@ -18,11 +23,19 @@ class PlanningView extends StatefulWidget {
 }
 
 class _PlanningViewState extends State<PlanningView> {
-  DateTime _currentDate = DateTime.now();
+  CalendarView _currentCalendarView = CalendarView.day;
+  late CalendarController _calendarController;
+
+  @override
+  void initState() {
+    _calendarController = CalendarController();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     double phoneWidth = MediaQuery.of(context).size.width;
+    double phoneHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: SafeArea(
@@ -48,7 +61,8 @@ class _PlanningViewState extends State<PlanningView> {
                   ),
                 ],
               ),
-              //! Indication sur l'utilité de la page
+
+              //! Indication sur l'utilité de la vue
               Row(
                 children: [
                   const FaIcon(
@@ -59,7 +73,7 @@ class _PlanningViewState extends State<PlanningView> {
                   Padding(
                     padding: const EdgeInsets.only(left: 5),
                     child: Text(
-                      "Visualisez votre organisation du jour.",
+                      "Une vision globale de vos missions.",
                       style: GoogleFonts.sourceSansPro(
                         fontWeight: FontWeight.bold,
                         color: MediplanColors.placeholder,
@@ -70,117 +84,237 @@ class _PlanningViewState extends State<PlanningView> {
                 ],
               ),
 
-              //! Liste des missions
-              BlocBuilder<MediplanBloc, MediplanState>(
-                builder: (context, mediplanState) {
-                  List<Mission>? missions = mediplanState.missions
-                      ?.where(
-                        (Mission mission) =>
-                            mission.start.day == _currentDate.day,
-                      )
-                      .toList();
-
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: missions!.isEmpty
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    'lib/images/Researching-amico.svg',
-                                    width: phoneWidth * 0.8,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 30),
-                                    child: Text(
-                                      textAlign: TextAlign.center,
-                                      "Vous n'avez pas de mission pour la date sélectionnée.",
-                                      style: GoogleFonts.sourceSansPro(
-                                        fontWeight: FontWeight.bold,
-                                        fontStyle: FontStyle.italic,
-                                        color: MediplanColors.placeholder,
-                                        fontSize: 18,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListView.separated(
-                              physics: const BouncingScrollPhysics(),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5),
-                              itemCount: missions.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom:
-                                        index == missions.length - 1 ? 10 : 0,
-                                  ),
-                                  child: MissionTile(mission: missions[index]),
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return const SizedBox(height: 15);
-                              },
+              //! Planning des missions
+              Padding(
+                padding: const EdgeInsets.only(top: 30),
+                child: Container(
+                  height: phoneHeight * 0.5,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: MediplanColors.quaternary,
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: Offset(4, 4),
+                      ),
+                    ],
+                  ),
+                  child: BlocBuilder<MediplanBloc, MediplanState>(
+                    builder: (context, state) {
+                      final List<Appointment> appointments = state.missions!
+                          .map(
+                            (Mission mission) => Appointment(
+                              startTime: mission.start,
+                              endTime: mission.end,
+                              location: mission.address,
+                              notes: mission.title,
+                              subject:
+                                  "${DateFormat("HH:mm").format(mission.start)} - ${DateFormat("HH:mm").format(mission.end)}\n${mission.patient}",
+                              color: MediplanColors.secondary,
                             ),
-                    ),
-                  );
-                },
-              ),
+                          )
+                          .toList();
 
-              const Padding(
-                padding: EdgeInsets.only(top: 15),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Divider(
-                    thickness: 4,
-                    color: MediplanColors.quaternary,
+                      return SfCalendar(
+                        controller: _calendarController,
+                        view: _currentCalendarView,
+                        dataSource: DataSource(appointments),
+                        firstDayOfWeek: 1,
+                        allowViewNavigation: true,
+                        showDatePickerButton: true,
+                        showTodayButton: true,
+                        showNavigationArrow: true,
+                        todayHighlightColor: MediplanColors.tertiary,
+                        headerDateFormat: "EEEE - dd/MM/y",
+                        headerStyle: CalendarHeaderStyle(
+                          textStyle: GoogleFonts.sourceSansPro(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                        appointmentTextStyle: GoogleFonts.sourceSansPro(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                        timeSlotViewSettings: const TimeSlotViewSettings(
+                          timeFormat: 'HH:mm',
+                          dateFormat: 'dd',
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
 
-              //! Sélecteur de date
+              const Spacer(),
+
+              //! Selecteur de vue
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _currentDate =
-                            _currentDate.subtract(const Duration(days: 1));
-                      });
-                    },
-                    icon: const FaIcon(
-                      FontAwesomeIcons.circleChevronLeft,
-                      color: MediplanColors.primary,
-                      size: 40,
+                  //! Vue jour
+                  Container(
+                    width: phoneWidth * 0.22,
+                    decoration: BoxDecoration(
+                      color: _currentCalendarView != CalendarView.day
+                          ? Colors.white
+                          : MediplanColors.tertiary,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: MediplanColors.quaternary,
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(15),
+                      child: InkWell(
+                        splashColor: MediplanColors.quaternary,
+                        borderRadius: BorderRadius.circular(15),
+                        onTap: _currentCalendarView != CalendarView.day
+                            ? () {
+                                setState(() {
+                                  _currentCalendarView = CalendarView.day;
+                                });
+                                _calendarController.view = CalendarView.day;
+                              }
+                            : null,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Jour",
+                                style: GoogleFonts.sourceSansPro(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color:
+                                      _currentCalendarView != CalendarView.day
+                                          ? Colors.black
+                                          : Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  Text(
-                    _currentDate.day == DateTime.now().day
-                        ? "Aujourd'hui"
-                        : DateFormat("dd/MM/yyyy").format(_currentDate),
-                    style: GoogleFonts.sourceSansPro(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30,
-                      color: MediplanColors.primary,
+
+                  //! Vue semaine
+                  Container(
+                    width: phoneWidth * 0.30,
+                    decoration: BoxDecoration(
+                      color: _currentCalendarView != CalendarView.week
+                          ? Colors.white
+                          : MediplanColors.tertiary,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: MediplanColors.quaternary,
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(15),
+                      child: InkWell(
+                        splashColor: MediplanColors.quaternary,
+                        borderRadius: BorderRadius.circular(15),
+                        onTap: _currentCalendarView != CalendarView.week
+                            ? () {
+                                setState(() {
+                                  _currentCalendarView = CalendarView.week;
+                                });
+                                _calendarController.view = CalendarView.week;
+                              }
+                            : null,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Semaine",
+                                style: GoogleFonts.sourceSansPro(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color:
+                                      _currentCalendarView != CalendarView.week
+                                          ? Colors.black
+                                          : Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _currentDate =
-                            _currentDate.add(const Duration(days: 1));
-                      });
-                    },
-                    icon: const FaIcon(
-                      FontAwesomeIcons.circleChevronRight,
-                      color: MediplanColors.primary,
-                      size: 42,
+
+                  //! Vue mois
+                  Container(
+                    width: phoneWidth * 0.22,
+                    decoration: BoxDecoration(
+                      color: _currentCalendarView != CalendarView.month
+                          ? Colors.white
+                          : MediplanColors.tertiary,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: MediplanColors.quaternary,
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(15),
+                      child: InkWell(
+                        splashColor: MediplanColors.quaternary,
+                        borderRadius: BorderRadius.circular(15),
+                        onTap: _currentCalendarView != CalendarView.month
+                            ? () {
+                                setState(() {
+                                  _currentCalendarView = CalendarView.month;
+                                });
+                                _calendarController.view = CalendarView.month;
+                              }
+                            : null,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Mois",
+                                style: GoogleFonts.sourceSansPro(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color:
+                                      _currentCalendarView != CalendarView.month
+                                          ? Colors.black
+                                          : Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],

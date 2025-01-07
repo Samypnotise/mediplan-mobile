@@ -6,7 +6,7 @@
 
 - [x] Un serveur qui envoie aux soignants des tournées à réaliser
 - [x] Le soignant peut visualiser ses missions selon un planning en vue jour
-- [ ] Le soignant peut visualiser ses missions selon un planning en vue semaine
+- [x] Le soignant peut visualiser ses missions selon un planning en vue semaine
 - [x] Le soignant peut chosir de visualiser l'itinéraire de sa mission sur Mediplan ou sur une autre application (Google Maps, Waze, Apple Plan...)
 - [x] Partie synchronisation avec l’agenda personnel
 - [x] Géoguidage de visite en visite (google maps entre chaque visite)
