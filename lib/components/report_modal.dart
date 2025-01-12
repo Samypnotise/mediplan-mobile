@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:mediplan/components/confirmation_modal.dart';
 import 'package:mediplan/components/input_widget.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
 import 'package:mediplan/models/mission.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 
 Future<dynamic> showReportModal(
   BuildContext context,
@@ -57,6 +63,12 @@ class ReportView extends StatefulWidget {
 class _ReportViewState extends State<ReportView> {
   bool _isRecording = false;
   bool _isPlaying = false;
+
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  // TODO : On init, récupérer le path depuis les données de l'API
+  String? _reportRecordingPath;
 
   @override
   Widget build(BuildContext context) {
@@ -234,56 +246,72 @@ class _ReportViewState extends State<ReportView> {
                 SizedBox(
                   height: widget.phoneHeight * 0.20,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: _reportRecordingPath != null
+                        ? MainAxisAlignment.spaceBetween
+                        : MainAxisAlignment.center,
                     children: [
                       //! Lecture du compte rendu s'il y en a un
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(50),
-                          color: _isPlaying
-                              ? MediplanColors.danger
-                              : MediplanColors.primary,
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  Colors.grey.withOpacity(0.5), // Shadow color
-                              spreadRadius: 1,
-                              blurRadius: 4,
-                              offset: const Offset(0, 3), // Shadow position
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(50),
-                          child: InkWell(
-                            splashColor: MediplanColors.quaternary,
+                      if (_reportRecordingPath != null)
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(50),
-                            onTap: () {
-                              // TODO : Lire le message vocal de l'utilisateur
-                              setState(() {
-                                _isPlaying = !_isPlaying;
-                              });
-                            },
-                            child: Center(
-                              child: Padding(
-                                padding:
-                                    EdgeInsets.only(left: _isPlaying ? 0 : 3),
-                                child: FaIcon(
-                                  _isPlaying
-                                      ? FontAwesomeIcons.pause
-                                      : FontAwesomeIcons.play,
-                                  color: Colors.white,
+                            color: _isPlaying
+                                ? MediplanColors.danger
+                                : MediplanColors.primary,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey
+                                    .withOpacity(0.5), // Shadow color
+                                spreadRadius: 1,
+                                blurRadius: 4,
+                                offset: const Offset(0, 3), // Shadow position
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(50),
+                            child: InkWell(
+                              splashColor: MediplanColors.quaternary,
+                              borderRadius: BorderRadius.circular(50),
+                              onTap: () async {
+                                if (_audioPlayer.playing) {
+                                  _audioPlayer.stop();
+
+                                  setState(() {
+                                    _isPlaying = false;
+                                  });
+                                } else {
+                                  //? Loading du fichier à lire
+                                  await _audioPlayer
+                                      .setFilePath(_reportRecordingPath!);
+
+                                  _audioPlayer.play();
+
+                                  setState(() {
+                                    _isPlaying = true;
+                                  });
+                                }
+                              },
+                              child: Center(
+                                child: Padding(
+                                  padding:
+                                      EdgeInsets.only(left: _isPlaying ? 0 : 3),
+                                  child: FaIcon(
+                                    _isPlaying
+                                        ? FontAwesomeIcons.pause
+                                        : FontAwesomeIcons.play,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
 
-                      //! Compte rendu vocal
+                      //! Enregistrement du compte rendu
                       Container(
                         width: 60,
                         height: 60,
@@ -308,12 +336,44 @@ class _ReportViewState extends State<ReportView> {
                           child: InkWell(
                             splashColor: MediplanColors.quaternary,
                             borderRadius: BorderRadius.circular(50),
-                            onTap: () {
-                              // TODO : Demander a l'utilisateur s'il veut ecraser l'enregistrement existant
-                              // TODO : Enregistrer le message vocal de l'utilisateur
-                              setState(() {
-                                _isRecording = !_isRecording;
-                              });
+                            onTap: () async {
+                              if (_isRecording) {
+                                String? recordedFilePath =
+                                    await _audioRecorder.stop();
+
+                                //? Signifie que le record a fonctionné
+                                if (recordedFilePath != null) {
+                                  setState(() {
+                                    _isRecording = false;
+                                    //? Mise à jour du path
+                                    _reportRecordingPath = recordedFilePath;
+                                  });
+                                }
+                              } else {
+                                // TODO : Demander a l'utilisateur s'il veut ecraser l'enregistrement existant
+                                if (await _audioRecorder.hasPermission()) {
+                                  //? On récupère le path des documents sur l'appareil de l'utilisateur
+                                  final Directory documentsDirectory =
+                                      await getApplicationDocumentsDirectory();
+
+                                  //? Construction du chemin de sauvegarde complet avec le nom du fichier
+                                  final String filePath = p.join(
+                                      documentsDirectory.path,
+                                      "${DateFormat("ddMMyyyyhhmmss").format(DateTime.now())}.m4a");
+
+                                  //? Début du record
+                                  await _audioRecorder.start(
+                                    const RecordConfig(),
+                                    path: filePath,
+                                  );
+
+                                  setState(() {
+                                    _isRecording = true;
+                                    // Nouvel enregistrement qui écrase l'ancien
+                                    _reportRecordingPath = null;
+                                  });
+                                }
+                              }
                             },
                             child: Center(
                               child: FaIcon(
