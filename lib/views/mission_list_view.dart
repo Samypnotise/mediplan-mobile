@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_bloc.dart';
+import 'package:mediplan/blocs/mediplan_bloc/mediplan_event.dart';
 import 'package:mediplan/blocs/mediplan_bloc/mediplan_state.dart';
 import 'package:mediplan/components/mission_tile.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';
@@ -109,23 +110,34 @@ class _MissionListViewState extends State<MissionListView> {
                                 ],
                               ),
                             )
-                          : ListView.separated(
-                              physics: const BouncingScrollPhysics(),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5),
-                              itemCount: missions.length,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom:
-                                        index == missions.length - 1 ? 10 : 0,
-                                  ),
-                                  child: MissionTile(mission: missions[index]),
-                                );
+                          : RefreshIndicator(
+                              color: MediplanColors.secondary,
+                              //? Permet de refresh la liste des missions
+                              onRefresh: () async {
+                                context
+                                    .read<MediplanBloc>()
+                                    .add(TriggerMissionUpdate());
+                                return;
                               },
-                              separatorBuilder: (context, index) {
-                                return const SizedBox(height: 15);
-                              },
+                              child: ListView.separated(
+                                physics: const BouncingScrollPhysics(),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 5),
+                                itemCount: missions.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                      bottom:
+                                          index == missions.length - 1 ? 10 : 0,
+                                    ),
+                                    child:
+                                        MissionTile(mission: missions[index]),
+                                  );
+                                },
+                                separatorBuilder: (context, index) {
+                                  return const SizedBox(height: 15);
+                                },
+                              ),
                             ),
                     ),
                   );

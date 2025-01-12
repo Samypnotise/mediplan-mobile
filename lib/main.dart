@@ -17,6 +17,7 @@ class Mediplan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: const Locale('fr', 'FR'),
       debugShowCheckedModeBanner: false,
       home: RepositoryProvider(
         create: (context) => AuthRepository(),

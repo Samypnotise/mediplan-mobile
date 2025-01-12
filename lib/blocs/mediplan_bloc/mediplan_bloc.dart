@@ -22,6 +22,10 @@ class MediplanBloc extends Bloc<MediplanEvent, MediplanState> {
       await attemptFetchingMissionSwapReceivedDemands(emit);
       await attemptFetchingUserMissions(emit);
     });
+
+    on<TriggerMissionUpdate>((event, emit) async {
+      await attemptFetchingUserMissions(emit);
+    });
   }
 
   Future<void> _onFetchUserData(
