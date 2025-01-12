@@ -45,5 +45,38 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+  <key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires access to your location for mission itinerary.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires access to your location for mission itinerary.</string>
+  <key>NSCalendarsUsageDescription</key>
+  <string>This app requiress access to your calendar to display your missions inside.</string>
+  <key>NSContactsUsageDescription</key>
+  <string>This app requires access to your calendar to display your missions inside.</string>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Some message to describe why you need this permission</string>
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+      <string>comgooglemaps</string>
+      <string>baidumap</string>
+      <string>iosamap</string>
+      <string>waze</string>
+      <string>yandexmaps</string>
+      <string>yandexnavi</string>
+      <string>citymapper</string>
+      <string>mapswithme</string>
+      <string>osmandmaps</string>
+      <string>dgis</string>
+      <string>qqmap</string>
+      <string>here-location</string>
+      <string>tomtomgo</string>
+      <string>copilot</string>
+      <string>com.sygic.aura</string>
+      <string>nmap</string>
+      <string>kakaomap</string>
+      <string>tmap</string>
+      <string>szn-mapy</string>
+      <string>mappls</string>
+  </array>
 </dict>
 </plist>
