@@ -2,8 +2,6 @@
 
 ## Points demandés
 
-### Soins à domicile
-
 - [x] Un serveur qui envoie aux soignants des tournées à réaliser
 - [x] Le soignant peut visualiser ses missions selon un planning en vue jour
 - [x] Le soignant peut visualiser ses missions selon un planning en vue semaine
@@ -11,7 +9,8 @@
 - [x] Partie synchronisation avec l’agenda personnel
 - [x] Géoguidage de visite en visite (google maps entre chaque visite)
 - [x] Possibilité pour l'aide-soignant de choisir une autre application de géoguidage
-- [ ] Saisir le rapport de fin de visite sous forme écrite ou enregistrement vocal et l’envoyer au serveur
+- [x] Saisir le rapport de fin de visite sous forme écrite ou enregistrement vocal
+- [ ] Relier la saisie du rapport à l'API (lors de l'enregistrement de ce dernier)
 - [x] Échange de mission entre deux soignants
 
 ---
