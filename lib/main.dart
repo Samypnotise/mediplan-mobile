@@ -1,10 +1,13 @@
-import 'package:mediplan/repositories/auth_repository.dart';
-import 'package:mediplan/views/Navigation/app_navigator.dart';
-import 'package:mediplan/blocs/session_bloc/session_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mediplan/blocs/session_bloc/session_cubit.dart';
+import 'package:mediplan/repositories/auth_repository.dart';
+import 'package:mediplan/views/Navigation/app_navigator.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
+
   runApp(const Mediplan());
 }
 
@@ -14,6 +17,7 @@ class Mediplan extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: const Locale('fr', 'FR'),
       debugShowCheckedModeBanner: false,
       home: RepositoryProvider(
         create: (context) => AuthRepository(),

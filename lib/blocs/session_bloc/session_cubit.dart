@@ -15,21 +15,18 @@ class SessionCubit extends Cubit<SessionState> {
   }
 
   void attemptAutoLogin() async {
-    print("auto login");
     final token = await secureStorage.read(key: 'jwt');
     final userId = await secureStorage.read(key: 'userId');
 
     if (token != null && userId != null) {
       try {
-        final response =
-            await authRepository.attemptAutoLogin(token: token, userId: userId);
+        final response = await authRepository.getUser(token: token);
 
-        final data = jsonDecode(response.body);
-        final user = User.fromJson({
-          'id': data?['id'],
-          'username': data?['username'],
-          'email': data?['email'],
-        }); // Assuming you have a User model
+        final user = User.fromJson(
+          jsonDecode(
+            response.body,
+          ),
+        ); // Assuming you have a User model
 
         showSession(user, token);
       } catch (e) {

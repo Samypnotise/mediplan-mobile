@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class MediplanColors {
-  static const primary = Color.fromRGBO(110, 89, 247, 1);
-  static const secondary = Color.fromRGBO(148, 129, 255, 1);
-  static const tertiary = Color.fromRGBO(184, 184, 255, 1);
-  static const quaternary = Color.fromRGBO(222, 218, 254, 1);
+  static const primary = Color.fromRGBO(0, 105, 145, 1); // Deep medical blue
+  static const secondary = Color.fromRGBO(0, 140, 190, 1); // Aqua blue
+  static const tertiary = Color.fromRGBO(72, 191, 227, 1); // Soft sky blue
+  static const quaternary = Color.fromRGBO(204, 236, 242, 1);
+  static const blur = Color.fromRGBO(72, 191, 227, 0.5);
 
   static const background = Color.fromRGBO(248, 247, 255, 1);
 

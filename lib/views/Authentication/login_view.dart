@@ -1,18 +1,18 @@
-import 'package:mediplan/components/custom_flushbar.dart';
-import 'package:mediplan/components/input_widget.dart';
-import 'package:mediplan/constants/mediplan_colors.dart';
-import 'package:mediplan/constants/flushbar_type.dart';
-import 'package:mediplan/blocs/login_bloc/login_bloc.dart';
-import 'package:mediplan/blocs/login_bloc/login_event.dart';
-import 'package:mediplan/blocs/login_bloc/login_state.dart';
-import 'package:mediplan/blocs/auth_bloc/auth_cubit.dart';
-import 'package:mediplan/repositories/auth_repository.dart';
-import 'package:mediplan/status/form_submission_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mediplan/blocs/auth_bloc/auth_cubit.dart';
+import 'package:mediplan/blocs/login_bloc/login_bloc.dart';
+import 'package:mediplan/blocs/login_bloc/login_event.dart';
+import 'package:mediplan/blocs/login_bloc/login_state.dart';
+import 'package:mediplan/components/custom_flushbar.dart';
+import 'package:mediplan/components/input_widget.dart';
+import 'package:mediplan/constants/flushbar_type.dart';
+import 'package:mediplan/constants/mediplan_colors.dart';
+import 'package:mediplan/repositories/auth_repository.dart';
+import 'package:mediplan/status/form_submission_status.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -43,11 +43,14 @@ class _LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Connexion',
-          style: TextStyle(
-            fontFamily: GoogleFonts.oleoScript().fontFamily,
-            fontSize: 50,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Text(
+            'Connexion',
+            style: TextStyle(
+              fontFamily: GoogleFonts.oleoScript().fontFamily,
+              fontSize: 55,
+            ),
           ),
         ),
       ),
@@ -55,31 +58,14 @@ class _LoginScreen extends StatelessWidget {
         child: SafeArea(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 30, right: 30),
-              child: Column(
-                children: [
-                  //! Login image
-                  SvgPicture.asset(
-                    'lib/images/Tablet-login-amico.svg',
-                    width: 250,
-                  ),
-                  //! Google login button
-                  const Padding(
-                    padding: EdgeInsets.only(top: 20),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 60,
-                      child: GoogleLoginButton(),
-                    ),
-                  ),
-                  //! OR separator
-                  const Padding(
-                    padding: EdgeInsets.only(top: 20),
-                    child: OrSeparator(),
-                  ),
-                  //! Login form
-                  LoginForm(formKey: _formKey),
-                ],
+              padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
+              child: Center(
+                child: Column(
+                  children: [
+                    //! Login form
+                    LoginForm(formKey: _formKey),
+                  ],
+                ),
               ),
             ),
           ),
@@ -125,44 +111,6 @@ class OrSeparator extends StatelessWidget {
   }
 }
 
-class GoogleLoginButton extends StatelessWidget {
-  const GoogleLoginButton({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: MediplanColors.quaternary,
-        elevation: 5,
-        shadowColor: MediplanColors.quaternary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          SvgPicture.asset(
-            'lib/images/google-logo.svg',
-            width: 32,
-          ),
-          Text(
-            "Se connecter avec Google",
-            style: GoogleFonts.sourceSansPro(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class LoginForm extends StatelessWidget {
   const LoginForm({
     super.key,
@@ -173,6 +121,8 @@ class LoginForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double phoneWidth = MediaQuery.of(context).size.width;
+
     return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
         final formStatus = state.formStatus;
@@ -195,9 +145,17 @@ class LoginForm extends StatelessWidget {
         key: _formKey,
         child: Column(
           children: [
+            //! Login image
+            Padding(
+              padding: const EdgeInsets.only(top: 50),
+              child: SvgPicture.asset(
+                'lib/images/Tablet-login-amico.svg',
+                width: phoneWidth * 0.8,
+              ),
+            ),
             //! Email input
             const Padding(
-              padding: EdgeInsets.only(top: 20),
+              padding: EdgeInsets.only(top: 70),
               child: EmailInput(),
             ),
             //! Password input
@@ -220,46 +178,49 @@ class LoginForm extends StatelessWidget {
                             strokeWidth: 6,
                           ),
                         )
-                      : SizedBox(
-                          width: double.infinity,
-                          height: 60,
-                          child: ElevatedButton(
-                            onPressed: () => {
-                              if (state.isValidEmail && state.isValidPassword)
-                                {
-                                  context
-                                      .read<LoginBloc>()
-                                      .add(LoginSubmitted())
-                                }
-                              else
-                                {
-                                  showCustomFlushbar(
-                                    context,
-                                    'Ouuups ...',
-                                    'Vous devez fournir votre email et votre mot de passe.',
-                                    const FaIcon(
-                                      FontAwesomeIcons.solidFaceFrownOpen,
-                                      color: Colors.white,
-                                      size: 30,
-                                    ),
-                                    FlushbarType.warning,
-                                  )
-                                }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: MediplanColors.primary,
-                              elevation: 5,
-                              shadowColor: MediplanColors.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                      : Padding(
+                          padding: const EdgeInsets.only(bottom: 15),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: () => {
+                                if (state.isValidEmail && state.isValidPassword)
+                                  {
+                                    context
+                                        .read<LoginBloc>()
+                                        .add(LoginSubmitted())
+                                  }
+                                else
+                                  {
+                                    showCustomFlushbar(
+                                      context,
+                                      'Ouuups ...',
+                                      'Vous devez fournir votre email et votre mot de passe.',
+                                      const FaIcon(
+                                        FontAwesomeIcons.solidFaceFrownOpen,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                      FlushbarType.warning,
+                                    )
+                                  }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: MediplanColors.primary,
+                                elevation: 5,
+                                shadowColor: MediplanColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              "Se connecter !",
-                              style: GoogleFonts.sourceSansPro(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: MediplanColors.background,
+                              child: Text(
+                                "Se connecter !",
+                                style: GoogleFonts.sourceSansPro(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: MediplanColors.background,
+                                ),
                               ),
                             ),
                           ),
@@ -297,10 +258,17 @@ class EmailInput extends StatelessWidget {
   }
 }
 
-class PasswordInput extends StatelessWidget {
+class PasswordInput extends StatefulWidget {
   const PasswordInput({
     super.key,
   });
+
+  @override
+  State<PasswordInput> createState() => _PasswordInputState();
+}
+
+class _PasswordInputState extends State<PasswordInput> {
+  bool _isPasswordHidden = true;
 
   @override
   Widget build(BuildContext context) {
@@ -317,21 +285,22 @@ class PasswordInput extends StatelessWidget {
           ),
           suffixIcon: Padding(
             padding: const EdgeInsets.only(right: 5),
-            child: TextButton(
-              child: Text(
-                "C'est oublié ?",
-                style: GoogleFonts.sourceSansPro(
-                  fontWeight: FontWeight.bold,
-                  color: MediplanColors.primary,
-                ),
-              ),
+            child: IconButton(
               onPressed: () {
-                context.read<AuthCubit>().showForgottenPasswordView();
+                setState(() {
+                  _isPasswordHidden = !_isPasswordHidden;
+                });
               },
+              icon: FaIcon(
+                _isPasswordHidden
+                    ? FontAwesomeIcons.solidEye
+                    : FontAwesomeIcons.solidEyeSlash,
+                color: MediplanColors.secondary,
+              ),
             ),
           ),
           placeholder: "●●●●●●●●●●",
-          isPassword: true,
+          isPassword: _isPasswordHidden,
         );
       },
     );

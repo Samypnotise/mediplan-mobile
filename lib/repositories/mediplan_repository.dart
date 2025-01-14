@@ -1,121 +1,64 @@
-import 'package:mediplan/routes/basic_routes.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediplan/routes/basic_routes.dart';
 
 class MediplanRepository {
-  Future<http.Response> getUser({
+  Future<http.Response> getReceivedMissionSwapDemands({
     required String userId,
     required String token,
   }) async {
     final response = await http.get(
-      Uri.parse(BasicRoutes.getById("users", userId)),
+      Uri.parse(
+          "${BasicRoutes.get("swap-requests")}?receiverId=$userId&status=PENDING"),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        "Content-Type": 'application/json',
+        "Authorization": 'Bearer $token'
       },
     );
 
     return response;
   }
 
-  Future<http.Response> getUserSettings({
+  Future<http.Response> getEmittedMissionSwapDemands({
     required String userId,
     required String token,
   }) async {
     final response = await http.get(
-      Uri.parse('${BasicRoutes.getById("users", userId)}/settings'),
+      Uri.parse(
+          "${BasicRoutes.get("swap-requests")}?senderId=$userId&status=PENDING"),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        "Content-Type": 'application/json',
+        "Authorization": 'Bearer $token'
       },
     );
 
     return response;
   }
 
-  Future<http.Response> getUserDeadlines({
+  Future<http.Response> getUserMissions({
     required String userId,
     required String token,
   }) async {
     final response = await http.get(
-      Uri.parse('${BasicRoutes.getById("users", userId)}/deadlines'),
+      // TODO : À voir pour refactor cette partie et gérer la pagination
+      Uri.parse("${BasicRoutes.get("missions")}?limit=100"),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        "Content-Type": 'application/json',
+        "Authorization": 'Bearer $token'
       },
     );
 
     return response;
   }
 
-  Future<http.Response> getUserJMethod({
-    required String userId,
+  Future<http.Response> getCaregivers({
     required String token,
   }) async {
     final response = await http.get(
-      Uri.parse('${BasicRoutes.getById("users", userId)}/j-method'),
+      // TODO : Idée d'amélioration : mettre le type de user dans des constantes
+      Uri.parse("${BasicRoutes.get("users")}/?type=CAREGIVER"),
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    return response;
-  }
-
-  Future<http.Response> getUserLessons({
-    required String userId,
-    required String token,
-  }) async {
-    final response = await http.get(
-      Uri.parse('${BasicRoutes.getById("users", userId)}/lessons'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    return response;
-  }
-
-  Future<http.Response> getUserSubjects({
-    required String userId,
-    required String token,
-  }) async {
-    final response = await http.get(
-      Uri.parse('${BasicRoutes.getById("users", userId)}/subjects'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    return response;
-  }
-
-  Future<http.Response> getUserFlashcards({
-    required String userId,
-    required String token,
-  }) async {
-    final response = await http.get(
-      Uri.parse('${BasicRoutes.getById("users", userId)}/flashcards'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    return response;
-  }
-
-  Future<http.Response> getUserStudySessions({
-    required String userId,
-    required String token,
-  }) async {
-    final response = await http.get(
-      Uri.parse('${BasicRoutes.getById("users", userId)}/study-sessions'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        "Content-Type": 'application/json',
+        "Authorization": 'Bearer $token'
       },
     );
 

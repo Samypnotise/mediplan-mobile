@@ -33,15 +33,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           password: state.password,
         );
 
-        if (response.statusCode == 201) {
+        if (response.statusCode == 200) {
           final data = jsonDecode(response.body);
-          final token = data['accessToken'];
 
-          final user = User.fromJson({
-            'id': data?['user']?['id'],
-            'username': data?['user']?['username'],
-            'email': data?['user']?['email'],
-          }); // Assuming you have a User model
+          final token = data['token'];
+
+          final getUserResponse = await authRepository.getUser(token: token);
+
+          final user = User.fromJson(
+            jsonDecode(
+              getUserResponse.body,
+            ),
+          );
 
           // Save JWT locally
           await secureStorage.write(key: 'jwt', value: token);
@@ -60,8 +63,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             ),
           );
         }
-
-        emit(state.copyWith(formStatus: const InitialFormStatus()));
 
         emit(state.copyWith(formStatus: SubmissionSuccess()));
         // Resetting to avoid flushbars when changing email/password values
