@@ -419,7 +419,6 @@ class NewSwapDemand extends StatelessWidget {
                       onPressed: isButtonDisabled
                           ? null
                           : () {
-                              // TODO : Open a confirmation modal to send the mission swap request
                               showConfirmationModal(
                                 context,
                                 heightMultiplicator: 0.30,
