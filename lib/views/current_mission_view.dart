@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:location/location.dart';
 import 'package:mediplan/components/maps_selection_modal.dart';
 import 'package:mediplan/components/report_modal.dart';
 import 'package:mediplan/constants/mediplan_colors.dart';

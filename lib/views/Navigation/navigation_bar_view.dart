@@ -48,7 +48,7 @@ class _NavigationBarViewState extends State<NavigationBarView> {
                       ),
                     ),
                     onPressed: () => state is CurrentMission
-                        ? navigationCubit.showPlanningView()
+                        ? navigationCubit.showHomeView()
                         : Scaffold.of(context).openDrawer(),
                   );
                 },
