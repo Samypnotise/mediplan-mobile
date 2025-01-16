@@ -6,6 +6,7 @@ import 'package:mediplan/repositories/auth_repository.dart';
 import 'package:mediplan/views/Navigation/app_navigator.dart';
 
 void main() async {
+  // TODO : Pour les futurs developpeurs, creez un fichier .env avec le contenu du fichier .env.example
   await dotenv.load(fileName: ".env");
 
   runApp(const Mediplan());

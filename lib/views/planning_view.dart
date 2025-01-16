@@ -111,7 +111,7 @@ class _PlanningViewState extends State<PlanningView> {
                               location: mission.address,
                               notes: mission.title,
                               subject:
-                                  "${DateFormat("HH:mm").format(mission.start)} - ${DateFormat("HH:mm").format(mission.end)}\n${mission.patient}",
+                                  "${DateFormat("HH:mm").format(mission.start)} - ${DateFormat("HH:mm").format(mission.end)}\n${mission.patient} - ${mission.title}",
                               color: MediplanColors.secondary,
                             ),
                           )
